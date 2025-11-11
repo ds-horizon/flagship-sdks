@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FlagshipFeatureFlags'
-  s.version          = '0.2.91'
+  s.version          = '0.2.92'
   s.summary          = 'FlagshipHorizon OpenFeature adapter for iOS'
 
   s.description      = <<-DESC
@@ -16,17 +16,12 @@ Pod::Spec.new do |s|
   Use it to register a FeatureProvider with OpenFeature and evaluate flags.
                        DESC
 
-  s.homepage         = 'https://github.com/ds-horizon/flagship-sdk-ios-framework'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.homepage         = 'https://github.com/ds-horizon/flagship-sdks'
+  s.license          = { :type => 'MIT', :file => 'ios-sdk/FlagshipFeatureFlags/LICENSE' }
   s.author           = { '210496608' => 'atharva.kothawade@dream11.com' }
-  # DEVELOPMENT CONFIGURATION (source code)
-  # s.source           = { :git => 'https://github.com/dream11/flagship-sdk.git', :tag => s.version.to_s }
-  # s.source_files = 'FlagshipFeatureFlags/Classes/**/*'
+  s.source           = { :git => 'https://github.com/ds-horizon/flagship-sdks.git', :tag => s.version.to_s }
+  s.source_files = 'ios-sdk/FlagshipFeatureFlags/FlagshipFeatureFlags/Classes/**/*'
   
-  # RELEASE CONFIGURATION (pre-built framework)
-  s.source           = { :git => 'https://github.com/ds-horizon/flagship-sdk-ios-framework.git', :tag => s.version.to_s }
-  s.ios.vendored_frameworks = 'FlagshipFeatureFlags.xcframework'
   s.ios.deployment_target = '14.0'
   s.swift_version = '5.5'
   s.framework = 'Foundation'
