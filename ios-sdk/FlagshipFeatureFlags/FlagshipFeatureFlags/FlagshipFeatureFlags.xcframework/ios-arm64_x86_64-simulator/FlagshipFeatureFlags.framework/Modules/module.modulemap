@@ -1,0 +1,11 @@
+framework module FlagshipFeatureFlags {
+  umbrella header "FlagshipFeatureFlags-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module FlagshipFeatureFlags.Swift {
+  header "FlagshipFeatureFlags-Swift.h"
+  requires objc
+}

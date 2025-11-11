@@ -1,0 +1,277 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-module-flags: -target arm64-apple-ios14.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name FlagshipFeatureFlags
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
+import Combine
+import CoreData
+import CryptoKit
+@_exported import FlagshipFeatureFlags
+import Foundation
+import OpenFeature
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public class CoreDataStore : FlagshipFeatureFlags.Store {
+  public init()
+  public func getFeatureFlagRulesConfig(for key: Swift.String) -> [Swift.String : Any]?
+  public func setFeatureFlagRulesConfig(_ configuration: [Swift.String : Any])
+  public func clearFeatureFlagRulesConfig()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class CoreDataUtility {
+  public static let shared: FlagshipFeatureFlags.CoreDataUtility
+  public var context: CoreData.NSManagedObjectContext {
+    get
+  }
+  public func saveContext()
+  public func clearAllData()
+  public func fetchEntity(for key: Swift.String) -> FlagshipFeatureFlags.FeatureFlagEntity?
+  public func createOrUpdateEntity(for key: Swift.String, jsonData: Foundation.Data) -> FlagshipFeatureFlags.FeatureFlagEntity?
+  @objc deinit
+}
+public protocol EvaluationProtocol {
+  func evaluateFlag<T>(key: Swift.String, feature: [Swift.String : Any], userHash: Swift.Int, targetingKey: Swift.String?, context: [Swift.String : OpenFeature.Value]?, contextFields: [Swift.String : [Swift.String : Any]], defaultValue: T) -> T
+}
+public struct FlagshipEvaluationContext {
+  public let key: Swift.String
+  public let feature: [Swift.String : Any]
+  public let userHash: Swift.Int
+  public let context: [Swift.String : OpenFeature.Value]?
+  public let defaultValue: Any
+  public init(key: Swift.String, feature: [Swift.String : Any], userHash: Swift.Int, context: [Swift.String : OpenFeature.Value]?, defaultValue: Any)
+}
+final public class FeatureAllocationEvaluator {
+  public init()
+  final public func evaluateFeatureAllocation<T>(key: Swift.String, feature: [Swift.String : Any], userHash: Swift.Int, targetingKey: Swift.String?, context: [Swift.String : OpenFeature.Value]?, contextFields: [Swift.String : [Swift.String : Any]], defaultValue: T) -> T
+  final public func evaluateDefaultRule<T>(key: Swift.String, feature: [Swift.String : Any], userHash: Swift.Int, targetingKey: Swift.String?, context: [Swift.String : OpenFeature.Value]?, defaultValue: T) -> T
+  @objc deinit
+}
+@_inheritsConvenienceInitializers @objc(FeatureFlagEntity) public class FeatureFlagEntity : CoreData.NSManagedObject {
+  @objc override dynamic public init(entity: CoreData.NSEntityDescription, insertInto context: CoreData.NSManagedObjectContext?)
+  @objc deinit
+}
+extension FlagshipFeatureFlags.FeatureFlagEntity {
+  @nonobjc public class func fetchRequest() -> CoreData.NSFetchRequest<FlagshipFeatureFlags.FeatureFlagEntity>
+  @objc @NSManaged dynamic public var key: Swift.String {
+    @objc get
+    @objc set
+  }
+  @objc @NSManaged dynamic public var jsonData: Foundation.Data? {
+    @objc get
+    @objc set
+  }
+  @objc @NSManaged dynamic public var createdAt: Foundation.Date {
+    @objc get
+    @objc set
+  }
+  @objc @NSManaged dynamic public var updatedAt: Foundation.Date {
+    @objc get
+    @objc set
+  }
+}
+public struct FeatureFlagConfiguration : Swift.Codable {
+  public let flags: [FlagshipFeatureFlags.Flag]
+  public init(flags: [FlagshipFeatureFlags.Flag])
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct Flag : Swift.Codable {
+  public let enabled: Swift.Bool
+  public let key: Swift.String
+  public let rolloutPercentage: Swift.Int
+  public let rules: [FlagshipFeatureFlags.Rule]
+  public let variants: [FlagshipFeatureFlags.VariantElement]
+  public init(enabled: Swift.Bool, key: Swift.String, rolloutPercentage: Swift.Int, rules: [FlagshipFeatureFlags.Rule], variants: [FlagshipFeatureFlags.VariantElement])
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct Rule : Swift.Codable {
+  public let allocations: [FlagshipFeatureFlags.AllocationElement]
+  public let constraints: [FlagshipFeatureFlags.Constraint]
+  public init(allocations: [FlagshipFeatureFlags.AllocationElement], constraints: [FlagshipFeatureFlags.Constraint])
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct AllocationElement : Swift.Codable {
+  public let percentage: Swift.Int
+  public let variantKey: Swift.String
+  public init(percentage: Swift.Int, variantKey: Swift.String)
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct Constraint : Swift.Codable {
+  public let contextField: Swift.String
+  public let constraintOperator: FlagshipFeatureFlags.Operator
+  public let value: FlagshipFeatureFlags.ConstraintValue
+  public init(contextField: Swift.String, constraintOperator: FlagshipFeatureFlags.Operator, value: FlagshipFeatureFlags.ConstraintValue)
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public enum Operator : Swift.String, Swift.Codable {
+  case contains
+  case equals
+  case greaterThan
+  case lessThan
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum ConstraintValue : Swift.Codable {
+  case anythingArray([Swift.String])
+  case bool(Swift.Bool)
+  case double(Swift.Double)
+  case integer(Swift.Int)
+  case string(Swift.String)
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+public struct VariantElement : Swift.Codable {
+  public let key: Swift.String
+  public let value: FlagshipFeatureFlags.VariantValue
+  public init(key: Swift.String, value: FlagshipFeatureFlags.VariantValue)
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+public enum VariantValue : Swift.Codable {
+  case anythingMap([Swift.String : Swift.String])
+  case bool(Swift.Bool)
+  case double(Swift.Double)
+  case string(Swift.String)
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+final public class FeatureRepository {
+  public init()
+  @objc deinit
+}
+final public class FlagshipEvaluationManager {
+  public init(httpTransport: FlagshipFeatureFlags.HttpTransport, coreDataStore: FlagshipFeatureFlags.CoreDataStore, config: FlagshipFeatureFlags.FlagshipFeatureConfig, featureRepository: FlagshipFeatureFlags.FeatureRepository)
+  final public func evaluateStringFlag(key: Swift.String, defaultValue: Swift.String, context: (any OpenFeature.EvaluationContext)?) -> Swift.String
+  final public func evaluateBooleanFlag(key: Swift.String, defaultValue: Swift.Bool, context: (any OpenFeature.EvaluationContext)?) -> Swift.Bool
+  final public func evaluateIntegerFlag(key: Swift.String, defaultValue: Swift.Int64, context: (any OpenFeature.EvaluationContext)?) -> Swift.Int64
+  final public func evaluateDoubleFlag(key: Swift.String, defaultValue: Swift.Double, context: (any OpenFeature.EvaluationContext)?) -> Swift.Double
+  final public func evaluateObjectFlag(key: Swift.String, defaultValue: OpenFeature.Value, context: (any OpenFeature.EvaluationContext)?) -> OpenFeature.Value
+  final public func startPolling()
+  final public func stopPolling()
+  final public func clearFlagCache()
+  @objc deinit
+}
+final public class FlagshipEvaluationPlugin : FlagshipFeatureFlags.EvaluationProtocol {
+  public init()
+  final public func evaluateFlag<T>(key: Swift.String, feature: [Swift.String : Any], userHash: Swift.Int, targetingKey: Swift.String?, context: [Swift.String : OpenFeature.Value]?, contextFields: [Swift.String : [Swift.String : Any]], defaultValue: T) -> T
+  @objc deinit
+}
+final public class FlagshipFeatureClient {
+  public init(config: FlagshipFeatureFlags.FlagshipFeatureConfig)
+  final public func getStringEvaluation(key: Swift.String, defaultValue: Swift.String, context: (any OpenFeature.EvaluationContext)?) -> Swift.String
+  final public func getBooleanEvaluation(key: Swift.String, defaultValue: Swift.Bool, context: (any OpenFeature.EvaluationContext)?) -> Swift.Bool
+  final public func getIntegerEvaluation(key: Swift.String, defaultValue: Swift.Int64, context: (any OpenFeature.EvaluationContext)?) -> Swift.Int64
+  final public func getDoubleEvaluation(key: Swift.String, defaultValue: Swift.Double, context: (any OpenFeature.EvaluationContext)?) -> Swift.Double
+  final public func getObjectEvaluation(key: Swift.String, defaultValue: OpenFeature.Value, context: (any OpenFeature.EvaluationContext)?) -> OpenFeature.Value
+  final public func clearFlagCache()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class FlagshipFeatureConfigManager {
+  public static let shared: FlagshipFeatureFlags.FlagshipFeatureConfigManager
+  final public func setConfig(_ config: FlagshipFeatureFlags.FlagshipFeatureConfig)
+  final public var config: FlagshipFeatureFlags.FlagshipFeatureConfig? {
+    get
+  }
+  final public var isConfigured: Swift.Bool {
+    get
+  }
+  final public func clearConfig()
+  @objc deinit
+}
+public struct FlagshipFeatureConfig {
+  public let baseURL: Swift.String
+  public let refreshInterval: Foundation.TimeInterval
+  public let tenantId: Swift.String
+  public init(baseURL: Swift.String, refreshInterval: Foundation.TimeInterval = 30, tenantId: Swift.String)
+}
+public class FlagshipFeaturesFlags {
+  public init()
+  public func add(_ a: Swift.Int, _ b: Swift.Int) -> Swift.Int
+  @objc deinit
+}
+public struct FlagshipFeatureMetadata : OpenFeature.ProviderMetadata {
+  public var name: Swift.String?
+}
+final public class FlagshipOpenFeatureProvider : OpenFeature.FeatureProvider {
+  final public func observe() -> Combine.AnyPublisher<OpenFeature.ProviderEvent?, Swift.Never>
+  final public var hooks: [any OpenFeature.Hook]
+  final public var metadata: any OpenFeature.ProviderMetadata
+  public init(config: FlagshipFeatureFlags.FlagshipFeatureConfig)
+  final public func initialize(initialContext: (any OpenFeature.EvaluationContext)?) async throws
+  final public func onContextSet(oldContext: (any OpenFeature.EvaluationContext)?, newContext: any OpenFeature.EvaluationContext) async throws
+  final public func getBooleanEvaluation(key: Swift.String, defaultValue: Swift.Bool, context: (any OpenFeature.EvaluationContext)?) throws -> OpenFeature.ProviderEvaluation<Swift.Bool>
+  final public func getStringEvaluation(key: Swift.String, defaultValue: Swift.String, context: (any OpenFeature.EvaluationContext)?) throws -> OpenFeature.ProviderEvaluation<Swift.String>
+  final public func getIntegerEvaluation(key: Swift.String, defaultValue: Swift.Int64, context: (any OpenFeature.EvaluationContext)?) throws -> OpenFeature.ProviderEvaluation<Swift.Int64>
+  final public func getDoubleEvaluation(key: Swift.String, defaultValue: Swift.Double, context: (any OpenFeature.EvaluationContext)?) throws -> OpenFeature.ProviderEvaluation<Swift.Double>
+  final public func getObjectEvaluation(key: Swift.String, defaultValue: OpenFeature.Value, context: (any OpenFeature.EvaluationContext)?) throws -> OpenFeature.ProviderEvaluation<OpenFeature.Value>
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers final public class HashUtility {
+  public static func generateHashForFlag(combinedString: Swift.String) -> Swift.Int
+  @objc deinit
+}
+final public class HttpTransport : FlagshipFeatureFlags.Transport {
+  final public let baseURL: Swift.String
+  final public let refreshInterval: Foundation.TimeInterval
+  public init(baseURL: Swift.String, refreshInterval: Foundation.TimeInterval = 30)
+  final public func fetchConfig() async throws -> Any
+  @objc deinit
+}
+public enum HttpError : Swift.Error {
+  case invalidURL
+  case requestFailed(Swift.String)
+  case noResponse
+}
+public struct HttpResponse {
+  public let statusCode: Swift.Int
+  public let headers: [Swift.AnyHashable : Any]
+  public let body: Foundation.Data?
+}
+@_hasMissingDesignatedInitializers final public class HttpUtility {
+  public static let shared: FlagshipFeatureFlags.HttpUtility
+  final public func get(url: Swift.String, headers: [Swift.String : Swift.String] = [:], maxRetries: Swift.Int = 3, delay: Foundation.TimeInterval = 0.5, timeout: Foundation.TimeInterval = 10) async throws -> FlagshipFeatureFlags.HttpResponse
+  @objc deinit
+}
+public struct PollingConfig {
+  public let interval: Foundation.TimeInterval
+  public init(interval: Foundation.TimeInterval)
+}
+public class PollingManager {
+  public init(config: FlagshipFeatureFlags.PollingConfig, pollingBlock: @escaping () async -> Swift.Void)
+  public func start()
+  public func stop()
+  @objc deinit
+}
+final public class SemverUtility {
+  public init()
+  public static func isSemver(_ version: Swift.String) -> Swift.Bool
+  public static func compareSemver(userVersion: Swift.String, expectedVersion: Swift.String) -> Swift.Int
+  public static func compareSemverStrings(userString: Swift.String, expectedString: Swift.String, comparator: (Swift.Int) -> Swift.Bool) -> Swift.Bool?
+  @objc deinit
+}
+public protocol Store {
+  func getFeatureFlagRulesConfig(for key: Swift.String) -> [Swift.String : Any]?
+  func setFeatureFlagRulesConfig(_ configuration: [Swift.String : Any])
+  func clearFeatureFlagRulesConfig()
+}
+@_hasMissingDesignatedInitializers public class TimestampUtility {
+  public static func getStoredTimestamp() -> Swift.Int64?
+  public static func storeTimestamp(_ timestamp: Swift.Int64)
+  public static func hasTimestampChanged(newTimestamp: Swift.Int64) -> Swift.Bool
+  public static func clearTimestamp()
+  @objc deinit
+}
+public protocol Transport {
+  func fetchConfig() async throws -> Any
+}
+extension FlagshipFeatureFlags.Operator : Swift.Equatable {}
+extension FlagshipFeatureFlags.Operator : Swift.Hashable {}
+extension FlagshipFeatureFlags.Operator : Swift.RawRepresentable {}

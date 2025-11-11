@@ -1,0 +1,238 @@
+{
+  "title": "Feature Flagging configuration schema",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "required": ["features", "updated_at"],
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "List of all feature flags",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "enabled",
+          "type",
+          "variants",
+          "rules",
+          "rollout_percentage",
+          "default_rule",
+          "updated_at"
+        ],
+        "properties": {
+          "rollout_percentage": {
+            "description": "Percentage of users that will qualify for flag evaluation",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "key": {
+            "description": "Unique identifier of the flag, used while evaluating the flag",
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Is the flag enabled or not. If not enabled, then default rule allocation is served",
+            "type": "boolean"
+          },
+          "type": {
+            "description": "Type of the flag, which defines the value type of its variants",
+            "type": "string",
+            "enum": ["string", "boolean", "integer", "object", "double"]
+          },
+          "variants": {
+            "description": "Variants of the flag. All variants will have the same value type",
+            "oneOf": [
+              {
+                "$ref": "#/$defs/string_variants"
+              },
+              {
+                "$ref": "#/$defs/boolean_variants"
+              },
+              {
+                "$ref": "#/$defs/object_variants"
+              },
+              {
+                "$ref": "#/$defs/double_variants"
+              }
+            ]
+          },
+          "rules": {
+            "description": "List of rules for this feature flag, where order defines priority.",
+            "type": "array",
+            "items": {
+              "description": "If constraints of a rule evaluate to true, its corresponding allocation is served.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["rule_id", "constraints", "allocations"],
+              "properties": {
+                "rule_id": {
+                  "description": "Unique identifier of the rule",
+                  "type": "number"
+                },
+                "constraints": {
+                  "description": "List of constraints for this rule. Logical AND is applied between multiple constraints.",
+                  "type": "array",
+                  "items": {
+                    "description": "Constraint to be evaluated against the user context",
+                    "type": "object",
+                    "required": ["context_field", "operator", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "context_field": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string",
+                        "enum": ["in", "gt", "lt", "gte", "lte", "eq", "neq"]
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "array",
+                          "boolean",
+                          "number",
+                          "integer"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "allocations": {
+                  "description": "List of variant allocations for this rule. The sum of all percentages must equal 100.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/allocation"
+                  }
+                }
+              }
+            }
+          },
+          "default_rule": {
+            "description": "Default rule to be applied if no other rules match or if the flag is disabled.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rule_id", "allocation"],
+            "properties": {
+              "rule_id": {
+                "description": "Unique identifier of the default rule",
+                "type": "number"
+              },
+              "allocation": {
+                "description": "List of variant allocations for the default rule. The sum of all percentages must equal 100.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/allocation"
+                }
+              }
+            }
+          },
+          "updated_at": {
+            "description": "Epoch timestamp (in seconds) when the flag was last updated",
+            "type": "number"
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "description": "Epoch timestamp (in seconds) when the configuration was last updated",
+      "type": "number"
+    }
+  },
+  "$defs": {
+    "allocation": {
+      "description": "Allocation of a variant to a percentage of users",
+      "type": "object",
+      "required": ["variant_key", "percentage"],
+      "additionalProperties": false,
+      "properties": {
+        "variant_key": {
+          "description": "Unique key of the variant to be allocated",
+          "type": "string"
+        },
+        "percentage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "string_variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/string_variant"
+      }
+    },
+    "string_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "object_variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/object_variant"
+      }
+    },
+    "object_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object"
+        }
+      }
+    },
+    "boolean_variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/boolean_variant"
+      }
+    },
+    "boolean_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "double_variants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/double_variant"
+      }
+    },
+    "double_variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

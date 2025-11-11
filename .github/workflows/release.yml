@@ -1,0 +1,98 @@
+name: Release Android SDK
+
+on:
+  push:
+    tags:
+      - "android-v*.*.*" # Triggers on Android tags like android-v1.2.3
+
+# Prevent duplicate concurrent runs of the same tag
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: [self-hosted]
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history for changelog generation
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Extract version from tag
+        run: |
+          # GITHUB_REF_NAME is like: android-v0.0.5
+          VERSION=${GITHUB_REF_NAME#android-v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Publishing Android version: $VERSION"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android-sdk/gradlew
+
+      # - name: Run tests
+      #   run: |
+      #     cd android-sdk
+      #     ./gradlew :FlagshipSdk:test --continue || echo "Some tests failed, but continuing with release"
+
+      - name: Build and publish to GitHub Packages
+        run: |
+          cd android-sdk
+          ./gradlew :FlagshipSdk:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Previous Android tag (2nd most recent by semver)
+          PREVIOUS_TAG=$(git tag --sort=-version:refname --list "android-v*" | sed -n '2p' || echo "")
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            CHANGELOG="## Changes since $PREVIOUS_TAG"$'\n'"$(git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG"..HEAD)"
+          else
+            CHANGELOG="## Initial Android Release"$'\n'"First release of Flagship Android SDK"
+          fi
+
+          {
+            echo "changelog<<EOF"
+            echo "$CHANGELOG"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create/Update GitHub Release and upload AAR
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}                    # bare tag, e.g. android-v0.0.5
+          name: Release ${{ env.VERSION }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ contains(env.VERSION, '-') }}       # true for e.g. 0.0.5-beta
+          files: android-sdk/FlagshipSdk/build/outputs/aar/*.aar
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

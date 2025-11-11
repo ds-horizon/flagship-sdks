@@ -1,0 +1,24 @@
+PODS:
+  - FlagshipFeatureFlags (0.2.9):
+    - OpenFeature (= 0.3.0)
+  - OpenFeature (0.3.0)
+
+DEPENDENCIES:
+  - FlagshipFeatureFlags (from `../`)
+  - OpenFeature (= 0.3.0)
+
+SPEC REPOS:
+  trunk:
+    - OpenFeature
+
+EXTERNAL SOURCES:
+  FlagshipFeatureFlags:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  FlagshipFeatureFlags: d59f37c51c3925d581cb0628ad96c50e3ea1cba3
+  OpenFeature: 985529d7d21078c4166233b254446728af642c49
+
+PODFILE CHECKSUM: 02b500bfb3e5e120da3fff02a97914223ffdb727
+
+COCOAPODS: 1.16.2

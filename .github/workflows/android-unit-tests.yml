@@ -1,0 +1,116 @@
+name: Android Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: android-unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-android:
+    name: Run Android unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect latest commit changes
+        id: latest
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const event = context.eventName;
+            let files = [];
+            if (event === 'pull_request' || event === 'pull_request_target') {
+              const sha = context.payload.pull_request.head.sha;
+              const { data } = await github.rest.repos.getCommit({
+                owner: context.repo.owner, repo: context.repo.repo, ref: sha,
+              });
+              files = (data.files || []).map(f => f.filename);
+            } else if (event === 'push') {
+              const sha = context.payload.after;
+              const { data } = await github.rest.repos.getCommit({
+                owner: context.repo.owner, repo: context.repo.repo, ref: sha,
+              });
+              files = (data.files || []).map(f => f.filename);
+            } else if (event === 'workflow_dispatch') {
+              core.setOutput('should_run', 'true'); return;
+            } else {
+              core.setOutput('should_run', 'false'); return;
+            }
+            core.setOutput('should_run',
+              files.some(fn => /^android-sdk\/FlagshipSdk\//.test(fn)) ? 'true' : 'false'
+            );
+
+      - name: No relevant changes; skip job
+        if: steps.latest.outputs.should_run != 'true'
+        run: echo "Latest commit has no changes under android-sdk/FlagshipSdk/**; skipping Android unit tests."
+
+      - name: Set up JDK 17
+        if: steps.latest.outputs.should_run == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Gradle
+        if: steps.latest.outputs.should_run == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android-sdk/**/*.gradle*', 'android-sdk/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        if: steps.latest.outputs.should_run == 'true'
+        working-directory: android-sdk
+        run: chmod +x ./gradlew
+
+      - name: Enable detailed test logging (per-test PASS lines)
+        if: steps.latest.outputs.should_run == 'true'
+        working-directory: android-sdk
+        run: |
+          cat > test-logging.init.gradle <<'EOF'
+          allprojects {
+            tasks.withType(Test).configureEach {
+              // Show standard Gradle test events too (optional)
+              testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                showExceptions = true
+                exceptionFormat "full"
+                showCauses = true
+                showStackTraces = true
+                showStandardStreams = true
+              }
+              // Emit lines like: INFO: Execute com.pkg.Class.method: PASSED
+              afterTest { desc, result ->
+                def rt = result.resultType?.toString() ?: "UNKNOWN"
+                def human = rt == "SUCCESS" ? "PASSED" : (rt == "SKIPPED" ? "SKIPPED" : "FAILED")
+                logger.lifecycle("INFO: Execute ${desc.className}.${desc.name}: ${human}")
+              }
+            }
+          }
+          EOF
+
+      - name: Run unit tests (FlagshipSdk Debug)
+        if: steps.latest.outputs.should_run == 'true'
+        working-directory: android-sdk
+        run: ./gradlew -I test-logging.init.gradle :FlagshipSdk:testDebugUnitTest --console=plain
+
+      - name: Upload test reports
+        if: always() && steps.latest.outputs.should_run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-reports
+          path: |
+            android-sdk/**/build/test-results/**/**
+            android-sdk/**/build/reports/tests/**/**
