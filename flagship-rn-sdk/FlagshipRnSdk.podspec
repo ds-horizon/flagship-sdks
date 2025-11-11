@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.public_header_files = "ios/FlagshipRnSdk.h"
   s.dependency "React-Core"
   s.dependency "OpenFeature", "0.3.0"
-  s.dependency "FlagshipFeatureFlags", "0.2.91"
+  s.dependency "FlagshipFeatureFlags", "0.2.92"
 
   s.swift_version = "5.0"
   s.pod_target_xcconfig = {
