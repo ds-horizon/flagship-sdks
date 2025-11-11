@@ -39,7 +39,34 @@ cd ios && pod install && cd ..
 
 #### Android
 
-No additional setup required. The SDK is automatically linked.
+The SDK requires GitHub credentials to access the Android SDK dependency from GitHub Packages. You need to set these credentials before building your Android app.
+
+**Option 1: Using Environment Variables (Recommended)**
+
+Set the following environment variables in your system:
+
+```sh
+export GITHUB_USERNAME=your-github-username
+export GITHUB_TOKEN=your-github-pat-token
+```
+
+**Option 2: Using Gradle Properties**
+
+Add the credentials to your `android/gradle.properties` file (or `~/.gradle/gradle.properties` for global configuration):
+
+```properties
+GITHUB_USERNAME=your-github-username
+GITHUB_TOKEN=your-github-pat-token
+```
+
+**When are credentials needed?**
+
+- During `gradle build` or `./gradlew build`
+- When running `npm run android` or `yarn android`
+- When Android Studio syncs the project
+- During CI/CD builds
+
+**Note:** The credentials are only used to download the Android SDK dependency from GitHub Packages. They are not included in your app bundle.
 
 ## Usage
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { multiply, initialize, setContext, getBooleanValue, getStringValue, getDoubleValue, getObjectValue } from '@d11/flagship-rn-sdk';
 
 const result = multiply(3, 7);
@@ -14,8 +14,9 @@ export default function App() {
   const [contextVariant, setContextVariant] = useState<'default' | 'alternate'>('default');
 
   useEffect(() => {
+    const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
     initialize({
-      baseUrl: 'http://localhost:8080',
+      baseUrl,
       tenantId: 'tenant1',
       refreshInterval: 60000,
     })

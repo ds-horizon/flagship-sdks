@@ -4,6 +4,7 @@ import android.util.Log
 import com.flagship.sdk.core.contracts.ICache
 import com.flagship.sdk.core.contracts.IEvaluator
 import com.flagship.sdk.core.models.AllocationElement
+import com.flagship.sdk.core.models.ArrayValue
 import com.flagship.sdk.core.models.Constraint
 import com.flagship.sdk.core.models.ConstraintValue
 import com.flagship.sdk.core.models.EvaluationContext
@@ -295,7 +296,10 @@ class EdgeEvaluator(
                         ?.value
                         ?.any {
                             Log.d("Rule evaluation", "in value $it left $left")
-                            it == left
+                            when (it) {
+                                is ArrayValue.StringValue -> it.value == left
+                                is ArrayValue.IntegerValue -> it.value == (left as? Number)?.toLong()
+                            }
                         }
                         ?: false
                 ).also {
