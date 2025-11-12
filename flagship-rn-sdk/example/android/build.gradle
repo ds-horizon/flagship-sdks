@@ -28,7 +28,7 @@ allprojects {
         mavenCentral()
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/dream11/flagship-sdk")
+            url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
             credentials {
                 username = project.findProperty("GITHUB_USERNAME") ?: System.getenv("GITHUB_USERNAME") ?: ""
                 password = project.findProperty("GITHUB_TOKEN") ?: System.getenv("GITHUB_TOKEN") ?: ""

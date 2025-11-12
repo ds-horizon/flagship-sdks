@@ -101,7 +101,7 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
-  implementation("com.flagship.sdk:flagship-sdk:0.0.52") {
+  implementation("com.flagship.sdk:flagship-sdk:0.0.6") {
     transitive = true
   }
   implementation "com.facebook.react:react-android"
