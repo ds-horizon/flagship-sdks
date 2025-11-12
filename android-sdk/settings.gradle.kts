@@ -11,7 +11,7 @@ pluginManagement {
         gradlePluginPortal()
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/dream11/flagship-sdk")
+            url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -24,7 +24,7 @@ dependencyResolutionManagement {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/dream11/flagship-sdk")
+            url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")

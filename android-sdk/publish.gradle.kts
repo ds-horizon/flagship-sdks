@@ -72,8 +72,8 @@ afterEvaluate {
                     }
 
                     scm {
-                        connection.set("scm:git:git://github.com/dream11/flagship-sdk.git")
-                        developerConnection.set("scm:git:ssh://github.com/dream11/flagship-sdk.git")
+                        connection.set("scm:git:git://github.com/ds-horizon/flagship-sdks.git")
+                        developerConnection.set("scm:git:ssh://github.com/ds-horizon/flagship-sdks.git")
                         url.set("https://github.com/ds-horizon/flagship-sdks")
                     }
                 }

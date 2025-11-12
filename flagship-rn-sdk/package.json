@@ -55,14 +55,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dream11/flagship-sdk.git"
+    "url": "git+https://github.com/ds-horizon/flagship-sdks.git"
   },
   "author": "dream11-atharva <atharva.kothawade@dream11.com> (https://github.com/dream11-atharva)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dream11/flagship-sdk"
+    "url": "https://github.com/ds-horizon/flagship-sdks"
   },
-  "homepage": "https://github.com/dream11/flagship-sdk",
+  "homepage": "https://github.com/ds-horizon/flagship-sdks",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

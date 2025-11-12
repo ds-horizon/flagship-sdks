@@ -8,7 +8,7 @@ buildscript {
     mavenCentral()
     maven {
       name = "GitHubPackages"
-      url = uri("https://maven.pkg.github.com/dream11/flagship-sdk")
+      url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
       credentials {
         username = project.findProperty("GITHUB_USERNAME") ?: System.getenv("GITHUB_USERNAME") ?: ""
         password = project.findProperty("GITHUB_TOKEN") ?: System.getenv("GITHUB_TOKEN") ?: ""
@@ -90,7 +90,7 @@ repositories {
   google()
   maven {
     name = "GitHubPackages"
-    url = uri("https://maven.pkg.github.com/dream11/flagship-sdk")
+    url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
     credentials {
       username = project.findProperty("GITHUB_USERNAME") ?: System.getenv("GITHUB_USERNAME") ?: ""
       password = project.findProperty("GITHUB_TOKEN") ?: System.getenv("GITHUB_TOKEN") ?: ""
@@ -101,7 +101,7 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
-  implementation("com.flagship.sdk:flagship-sdk:0.0.6") {
+  implementation("com.flagship.sdk:flagship-sdk:0.0.61") {
     transitive = true
   }
   implementation "com.facebook.react:react-android"
