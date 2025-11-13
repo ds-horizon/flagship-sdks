@@ -20,19 +20,9 @@ buildscript {
 
 apply plugin: "com.facebook.react.rootproject"
 
-// This is needed for dependency resolution when the library module includes FlagshipSdk
-// The repository is only for resolving dependencies, not for adding them to the app
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
-            credentials {
-                username = project.findProperty("GITHUB_USERNAME") ?: System.getenv("GITHUB_USERNAME") ?: ""
-                password = project.findProperty("GITHUB_TOKEN") ?: System.getenv("GITHUB_TOKEN") ?: ""
-            }
-        }
     }
 }
