@@ -74,7 +74,7 @@ fun OpenFeatureScreen(
                     applicationContext = applicationContext,
                     baseUrl = "http://10.0.2.2:8080",
                     tenantId = "tenant1",
-                    refreshInterval = TimeUnit.SECONDS.toMillis(60),
+                    refreshInterval = TimeUnit.SECONDS.toMillis(10),
                 )
 
             val provider = FlagshipProvider("test-domain", config)

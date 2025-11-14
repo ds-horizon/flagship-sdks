@@ -65,9 +65,13 @@ class EdgeEvaluator(
                 }
             }
 
-            val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, config.defaultRule.allocation, config.defaultRule.ruleName)
-            val defaultVariant = getVariantValue(config.variants, defaultAllocation)
-            return@run AllocationUtility.buildBooleanResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            val defaultRule = config.defaultRule
+            if (defaultRule != null) {
+                val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
+                val defaultVariant = getVariantValue(config.variants, defaultAllocation)
+                return@run AllocationUtility.buildBooleanResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            }
+            return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
             evaluateCache.put(flagKey, it.value)
             Log.d("EdgeEvaluator" , "Also block called")
@@ -111,9 +115,13 @@ class EdgeEvaluator(
                 }
             }
 
-            val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, config.defaultRule.allocation, config.defaultRule.ruleName)
-            val defaultVariant = getVariantValue(config.variants, defaultAllocation)
-            return@run AllocationUtility.buildStringResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            val defaultRule = config.defaultRule
+            if (defaultRule != null) {
+                val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
+                val defaultVariant = getVariantValue(config.variants, defaultAllocation)
+                return@run AllocationUtility.buildStringResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            }
+            return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
             evaluateCache.put(flagKey, it.value)
         }
@@ -156,9 +164,13 @@ class EdgeEvaluator(
                 }
             }
 
-            val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, config.defaultRule.allocation, config.defaultRule.ruleName)
-            val defaultVariant = getVariantValue(config.variants, defaultAllocation)
-            return@run AllocationUtility.buildIntResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            val defaultRule = config.defaultRule
+            if (defaultRule != null) {
+                val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
+                val defaultVariant = getVariantValue(config.variants, defaultAllocation)
+                return@run AllocationUtility.buildIntResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            }
+            return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
             evaluateCache.put(flagKey, it.value)
         }
@@ -201,9 +213,13 @@ class EdgeEvaluator(
                 }
             }
 
-            val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, config.defaultRule.allocation, config.defaultRule.ruleName)
-            val defaultVariant = getVariantValue(config.variants, defaultAllocation)
-            return@run AllocationUtility.buildDoubleResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            val defaultRule = config.defaultRule
+            if (defaultRule != null) {
+                val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
+                val defaultVariant = getVariantValue(config.variants, defaultAllocation)
+                return@run AllocationUtility.buildDoubleResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            }
+            return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
             evaluateCache.put(flagKey, it.value)
         }
@@ -247,9 +263,13 @@ class EdgeEvaluator(
                 }
             }
 
-            val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, config.defaultRule.allocation, config.defaultRule.ruleName)
-            val defaultVariant = getVariantValue(config.variants, defaultAllocation)
-            return@run AllocationUtility.buildObjectResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            val defaultRule = config.defaultRule
+            if (defaultRule != null) {
+                val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
+                val defaultVariant = getVariantValue(config.variants, defaultAllocation)
+                return@run AllocationUtility.buildObjectResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
+            }
+            return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
             evaluateCache.put(flagKey, it.value)
         }

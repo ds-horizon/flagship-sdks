@@ -1,5 +1,6 @@
 package com.flagship.sdk.plugins
 
+import android.util.Log
 import com.flagship.sdk.core.contracts.ICache
 import com.flagship.sdk.core.contracts.IRepository
 import com.flagship.sdk.core.contracts.IStore
@@ -67,6 +68,11 @@ class Repository(
                 val timestamp = extractTimestampFromHeaders(fullResult.headers)
 
                 if (timestamp != null) {
+                    Log.d("Flagship", "CONFIG CHANGED")
+                    
+                    cache.invalidateNamespace()
+                    configCache.putAll(fullResult.data.features.associateBy { it.key })
+                    
                     val snapShot =
                         ConfigSnapshot(
                             namespace = "default",
@@ -75,7 +81,7 @@ class Repository(
                             json = JsonUtility.toJson(fullResult.data),
                         )
                     store.replace(snapShot)
-                    configCache.putAll(fullResult.data.features.associateBy { it.key })
+                    
                     persistentCache.put(
                         SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS,
                         timestamp,
@@ -106,6 +112,8 @@ class Repository(
 
                     if (timestampChanged) {
                         syncWithFullConfig()
+                    } else {
+                        Log.d("Flagship", "+++ CONFIG UNCHANGED")
                     }
                 }
             }
@@ -134,3 +142,5 @@ class Repository(
         cache.invalidateNamespace()
     }
 }
+
+

@@ -160,19 +160,27 @@ tasks.register("cleanBuildPublishFlagship") {
     dependsOn("clean")
     dependsOn("bundleReleaseAar")
     dependsOn("publishBarPublicationToSonatypeRepository")
-    dependsOn("publishToSonatype")
-    dependsOn("closeSonatypeStagingRepository")
+    // Only add root project tasks if they exist
+    rootProject.tasks.findByName("publishToSonatype")?.let {
+        dependsOn(it)
+    }
+    rootProject.tasks.findByName("closeSonatypeStagingRepository")?.let {
+        dependsOn(it)
+    }
 }
 
 afterEvaluate {
     tasks.named("publishBarPublicationToSonatypeRepository") {
         mustRunAfter("bundleReleaseAar")
     }
-    tasks.named("publishToSonatype") {
-        mustRunAfter("publishBarPublicationToSonatypeRepository")
+    // Only configure root project tasks if they exist
+    rootProject.tasks.findByName("publishToSonatype")?.let { publishTask ->
+        publishTask.mustRunAfter("publishBarPublicationToSonatypeRepository")
     }
-    tasks.named("closeSonatypeStagingRepository") {
-        mustRunAfter("publishToSonatype")
+    rootProject.tasks.findByName("closeSonatypeStagingRepository")?.let { closeTask ->
+        rootProject.tasks.findByName("publishToSonatype")?.let { publishTask ->
+            closeTask.mustRunAfter(publishTask)
+        }
     }
     tasks.named("signBarPublication") {
         dependsOn("bundleReleaseAar")

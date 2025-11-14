@@ -90,7 +90,7 @@ fun MainScreen(
                     applicationContext = applicationContext,
                     baseUrl = "http://10.0.2.2:8080",
                     tenantId = "tenant1",
-                    refreshInterval = TimeUnit.SECONDS.toMillis(60),
+                    refreshInterval = TimeUnit.SECONDS.toMillis(10),
                 )
             flagshipClient = FlagShipClient.getInstance("test-domain", config)
             isInitialized = true

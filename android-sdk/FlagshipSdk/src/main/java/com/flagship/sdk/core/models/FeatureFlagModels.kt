@@ -40,7 +40,7 @@ data class Feature(
      * Default rule to be applied if no other rules match or if the flag is disabled.
      */
     @SerialName("default_rule")
-    val defaultRule: DefaultRule,
+    val defaultRule: DefaultRule? = null,
     /**
      * Is the flag enabled or not. If not enabled, then default rule allocation is served
      */
@@ -57,7 +57,7 @@ data class Feature(
     /**
      * List of rules for this feature flag, where order defines priority.
      */
-    val rules: List<Rule>,
+    val rules: List<Rule> = emptyList(),
     /**
      * Type of the flag, which defines the value type of its variants
      */
@@ -70,7 +70,7 @@ data class Feature(
     /**
      * Variants of the flag. All variants will have the same value type
      */
-    val variants: List<VariantElement>,
+    val variants: List<VariantElement> = emptyList(),
 )
 
 /**
@@ -82,7 +82,7 @@ data class DefaultRule(
      * List of variant allocations for the default rule. The sum of all percentages must equal
      * 100.
      */
-    val allocation: List<AllocationElement>,
+    val allocation: List<AllocationElement> = emptyList(),
     /**
      * Unique identifier of the default rule
      */
@@ -111,11 +111,11 @@ data class Rule(
     /**
      * List of variant allocations for this rule. The sum of all percentages must equal 100.
      */
-    val allocations: List<AllocationElement>,
+    val allocations: List<AllocationElement> = emptyList(),
     /**
      * List of constraints for this rule. Logical AND is applied between multiple constraints.
      */
-    val constraints: List<Constraint>,
+    val constraints: List<Constraint> = emptyList(),
     /**
      * Unique identifier of the rule
      */
