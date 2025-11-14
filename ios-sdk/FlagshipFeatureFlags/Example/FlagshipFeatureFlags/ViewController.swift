@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         // This avoids the Core Data setup complexity
         let config = FlagshipFeatureConfig(
             baseURL: "http://localhost:8080",
-            refreshInterval: 60,
+            refreshInterval: 10,
             tenantId: "tenant1"
         )
         
