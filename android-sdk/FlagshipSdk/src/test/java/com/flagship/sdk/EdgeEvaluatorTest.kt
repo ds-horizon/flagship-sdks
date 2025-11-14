@@ -759,6 +759,62 @@ class EdgeEvaluatorTest {
         )
     }
 
+    @Test
+    fun `evaluateInt returns variant value when value in list matches`() {
+        listTestData().forEach { (contextField, valueList, shouldMatch) ->
+            // Given
+            val flagKey = "test_flag"
+            val defaultValue = 10
+            val targetingKey = "user123"
+            val context = EvaluationContext(targetingKey, mapOf("app_version" to "1.2.3",
+                "age" to 35, "country" to "IND", "screen_time" to 69))
+
+            val variant = VariantElement("variant_a", VariantValue.IntegerValue(69))
+            val defaultVariant = VariantElement("variant_default", VariantValue.IntegerValue(42))
+            val allocation = AllocationElement(100, "variant_a")
+            val constraint = Constraint(contextField, Operator.In, ConstraintValue.AnythingArrayValue(valueList))
+            val rule = Rule(listOf(allocation), listOf(constraint), "1")
+            val config =
+                createTestFeature(
+                    rolloutPercentage = 100,
+                    rules = listOf(rule),
+                    variants = listOf(variant, defaultVariant),
+                    defaultAllocation = listOf(AllocationElement(100, "variant_default")),
+                )
+
+            every { evaluateCache.get<Int>(flagKey) } returns null
+
+            // When
+            val result = edgeEvaluator.evaluateInt(flagKey, defaultValue, config, context)
+
+            // Then
+            if (shouldMatch) {
+                assertEquals(69, result.value)
+                assertEquals("variant_a", result.variant)
+                assertEquals(Reason.TARGETING_MATCH, result.reason)
+            } else {
+                assertEquals(42, result.value)
+                assertEquals("variant_default", result.variant)
+                assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
+            }
+        }
+    }
+
+    private fun listTestData(): List<Triple<String, List<ArrayValue>, Boolean>> {
+        return listOf(
+            Triple("app_version", listOf(ArrayValue.SemverValue("1.2.1"),
+                ArrayValue.SemverValue("1.2.3"),
+                ArrayValue.SemverValue("1.2.3.1"),
+                ), true),
+            Triple("age", listOf(ArrayValue.IntegerValue(18), ArrayValue.IntegerValue(20)), false),
+            Triple("country", listOf(ArrayValue.StringValue("USA"), ArrayValue.StringValue("fr"),
+                ArrayValue.StringValue("UK"), ArrayValue.StringValue("IND")), true),
+            Triple("screen_time", listOf(ArrayValue.IntegerValue(100),
+                ArrayValue.IntegerValue(101),
+                ArrayValue.IntegerValue(69), ArrayValue.IntegerValue(70)), true)
+        )
+    }
+
     // ========== Helper Methods ==========
 
     private fun createTestFeature(

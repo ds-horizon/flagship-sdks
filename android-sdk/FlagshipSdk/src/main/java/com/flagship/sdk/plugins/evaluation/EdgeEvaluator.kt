@@ -313,9 +313,9 @@ class EdgeEvaluator(
                                         val leftString = left as? String ?: return false
                                         val leftVersion = Version.parse(leftString)
                                         val rightVersion = Version.parse(it.value)
-                                        return leftVersion.compareToIgnoreBuildMetadata(rightVersion) == 0
+                                        leftVersion.compareToIgnoreBuildMetadata(rightVersion) == 0
                                     } catch (e: Exception) {
-                                        return false
+                                        false
                                     }
                                 }
                             }
