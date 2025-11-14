@@ -38,6 +38,9 @@ public final class HttpUtility {
                 var request = URLRequest(url: url)
                 request.httpMethod = "GET"
                 request.timeoutInterval = timeout
+                request.cachePolicy = .reloadIgnoringLocalCacheData
+                request.setValue("no-cache, no-store, must-revalidate", forHTTPHeaderField: "Cache-Control")
+                request.setValue("no-cache", forHTTPHeaderField: "Pragma")
                 
                 for (key, value) in headers {
                     request.setValue(value, forHTTPHeaderField: key)
