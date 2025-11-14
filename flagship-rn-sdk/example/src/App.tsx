@@ -18,7 +18,7 @@ export default function App() {
     initialize({
       baseUrl,
       tenantId: 'tenant1',
-      refreshInterval: 60000,
+      refreshInterval: 10,
     })
       .then(() => {
         setIsInitialized(true);
