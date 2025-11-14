@@ -57,6 +57,7 @@ final class DataSyncManager {
             return
         }
         
+        print("Flagship: 🔄 CONFIG CHANGED")
         featureRepository.updateFeaturesMap(from: responseDict)
         featureRepository.updateContextFieldsMap(from: responseDict)
         flagEvaluator.clearCacheOnFeatureUpdate()
