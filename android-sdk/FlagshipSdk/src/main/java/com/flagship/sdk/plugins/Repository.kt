@@ -108,7 +108,7 @@ class Repository(
                 )
 
                 if (newTimestamp != null && storedTimestamp != null) {
-                    val timestampChanged = newTimestamp > storedTimestamp
+                    val timestampChanged = newTimestamp != storedTimestamp
 
                     if (timestampChanged) {
                         syncWithFullConfig()
