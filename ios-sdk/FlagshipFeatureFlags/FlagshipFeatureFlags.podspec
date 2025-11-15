@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FlagshipFeatureFlags'
-  s.version          = '0.2.93'
+  s.version          = '0.2.94'
   s.summary          = 'FlagshipHorizon OpenFeature adapter for iOS'
 
   s.description      = <<-DESC
