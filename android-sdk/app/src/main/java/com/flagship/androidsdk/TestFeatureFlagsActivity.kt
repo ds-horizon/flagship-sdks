@@ -58,7 +58,7 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
                     tenantId = "tenant1", // Default tenant, can be changed
                     refreshInterval =
                         java.util.concurrent.TimeUnit.SECONDS
-                            .toMillis(10),
+                            .toMillis(30),
                 )
 
             flagshipClient = FlagShipClient.getInstance("test-domain", config)

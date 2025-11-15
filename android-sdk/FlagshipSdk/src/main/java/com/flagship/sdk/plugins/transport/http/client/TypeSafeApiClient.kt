@@ -12,10 +12,6 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
-/**
- * Type-safe API client that uses reified types for better serialization handling.
- * This version provides better type safety by using reified generics.
- */
 class TypeSafeApiClient(
     @PublishedApi internal val baseUrl: String,
     @PublishedApi internal val httpClient: OkHttpClient,
@@ -26,9 +22,6 @@ class TypeSafeApiClient(
             encodeDefaults = false
         },
 ) {
-    /**
-     * Execute a GET request with type safety
-     */
     suspend inline fun <reified T> get(
         endpoint: String,
         headers: Map<String, String> = emptyMap(),
@@ -41,9 +34,6 @@ class TypeSafeApiClient(
             queryParams = queryParams,
         )
 
-    /**
-     * Execute a POST request with type safety
-     */
     suspend inline fun <reified T, reified R> post(
         endpoint: String,
         body: R? = null,
@@ -58,9 +48,6 @@ class TypeSafeApiClient(
             queryParams = queryParams,
         )
 
-    /**
-     * Execute a PUT request with type safety
-     */
     suspend inline fun <reified T, reified R> put(
         endpoint: String,
         body: R? = null,
@@ -75,9 +62,6 @@ class TypeSafeApiClient(
             queryParams = queryParams,
         )
 
-    /**
-     * Execute a PATCH request with type safety
-     */
     suspend inline fun <reified T, reified R> patch(
         endpoint: String,
         body: R? = null,
@@ -92,9 +76,6 @@ class TypeSafeApiClient(
             queryParams = queryParams,
         )
 
-    /**
-     * Execute a DELETE request with type safety
-     */
     suspend inline fun <reified T> delete(
         endpoint: String,
         headers: Map<String, String> = emptyMap(),
@@ -107,9 +88,6 @@ class TypeSafeApiClient(
             queryParams = queryParams,
         )
 
-    /**
-     * Execute HTTP request with full type safety
-     */
     @PublishedApi
     internal suspend inline fun <reified T> executeTypeSafe(
         method: HttpMethod,
@@ -131,9 +109,6 @@ class TypeSafeApiClient(
             }
         }
 
-    /**
-     * Build HTTP request
-     */
     @PublishedApi
     internal fun buildHttpRequest(
         method: HttpMethod,
@@ -145,17 +120,14 @@ class TypeSafeApiClient(
         val url = buildUrl(endpoint, queryParams)
         val requestBuilder = Request.Builder().url(url)
 
-        // Add headers
         headers.forEach { (key, value) ->
             requestBuilder.addHeader(key, value)
         }
 
-        // Add default headers if not present
         if (!headers.containsKey("Accept")) {
             requestBuilder.addHeader("Accept", "application/json")
         }
 
-        // Set HTTP method and body
         when (method) {
             HttpMethod.GET -> requestBuilder.get()
             HttpMethod.POST -> requestBuilder.post(createRequestBody(body))
@@ -167,9 +139,6 @@ class TypeSafeApiClient(
         return requestBuilder.build()
     }
 
-    /**
-     * Build full URL with query parameters
-     */
     @PublishedApi
     internal fun buildUrl(
         endpoint: String,
@@ -191,9 +160,6 @@ class TypeSafeApiClient(
         return "$baseUrl?$queryString"
     }
 
-    /**
-     * Create request body from object
-     */
     @PublishedApi
     internal fun createRequestBody(body: Any?): RequestBody {
         if (body == null) {
@@ -210,9 +176,6 @@ class TypeSafeApiClient(
         }
     }
 
-    /**
-     * Parse HTTP response with full type safety using reified types
-     */
     @PublishedApi
     internal inline fun <reified T> parseTypeSafeResponse(response: okhttp3.Response): ApiResponse<T> {
         val responseBody = response.body?.string() ?: ""
@@ -225,7 +188,6 @@ class TypeSafeApiClient(
                         T::class == String::class -> responseBody as T?
                         T::class == Unit::class -> Unit as T?
                         else -> {
-                            // Use reified type for safe deserialization
                             json.decodeFromString<T>(responseBody)
                         }
                     }
@@ -238,7 +200,7 @@ class TypeSafeApiClient(
                 ApiResponse.Error(
                     code = response.code,
                     message = "Failed to parse response: ${e.message}",
-                    rawResponse = responseBody,
+                    rawResponse = responseBody.take(500),
                     exception = e,
                 )
             }
@@ -246,41 +208,29 @@ class TypeSafeApiClient(
             ApiResponse.Error(
                 code = response.code,
                 message = response.message,
-                rawResponse = responseBody,
+                rawResponse = responseBody.take(500),
             )
         }
     }
 
     companion object {
-        /**
-         * Create a TypeSafeApiClient with default HTTP client
-         */
         fun create(baseUrl: String): TypeSafeApiClient =
             TypeSafeApiClient(
                 baseUrl = baseUrl,
                 httpClient = HttpClientBuilder.createDefault(),
             )
 
-        /**
-         * Create a TypeSafeApiClient with custom HTTP client
-         */
         fun create(
             baseUrl: String,
             httpClient: OkHttpClient,
         ): TypeSafeApiClient = TypeSafeApiClient(baseUrl, httpClient)
 
-        /**
-         * Create a TypeSafeApiClient for debugging
-         */
         fun createDebug(baseUrl: String): TypeSafeApiClient =
             TypeSafeApiClient(
                 baseUrl = baseUrl,
                 httpClient = HttpClientBuilder.createDebug(),
             )
 
-        /**
-         * Create a TypeSafeApiClient for production
-         */
         fun createProduction(baseUrl: String): TypeSafeApiClient =
             TypeSafeApiClient(
                 baseUrl = baseUrl,

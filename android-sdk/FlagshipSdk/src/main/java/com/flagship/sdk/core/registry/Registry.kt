@@ -17,7 +17,6 @@ import com.flagship.sdk.plugins.storage.sqlite.DatabaseBuilder
 import com.flagship.sdk.plugins.storage.sqlite.SQLiteStore
 import com.flagship.sdk.plugins.storage.sqlite.entities.ConfigSnapshot
 import com.flagship.sdk.plugins.transport.http.FlagshipHttpTransport
-import com.flagship.sdk.plugins.transport.http.interceptors.ETagResponseInterceptor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -45,7 +44,7 @@ class Registry(
                 pollingInterval = config.refreshInterval,
                 tenantId = config.tenantId,
                 enableLogging = true,
-                mockInterceptors = listOf(ETagResponseInterceptor(persistentCache)),
+                mockInterceptors = emptyList(),
             )
         store = initializeStorage(config.applicationContext)
         repository =

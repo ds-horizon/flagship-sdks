@@ -13,7 +13,6 @@ import com.flagship.sdk.plugins.storage.sqlite.entities.ConfigSnapshot
 import com.flagship.sdk.plugins.storage.sqlite.utility.JsonUtility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -47,55 +46,63 @@ class Repository(
     }
 
     override suspend fun fetchConfig(isFirstTime: Boolean) {
-        val storedTimestamp = persistentCache.get<Long>(SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS)
+        try {
+            val storedTimestamp = persistentCache.get<Long>(SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS)
 
-        if (storedTimestamp == null) {
-            syncWithFullConfig()
-        } else {
-            syncWithTimeOnlyCheck()
+            if (storedTimestamp == null) {
+                syncWithFullConfig()
+            } else {
+                syncWithTimeOnlyCheck()
+            }
+        } catch (e: Exception) {
         }
     }
 
     private suspend fun syncWithFullConfig() {
-        val fullResult = transport
-            .fetchConfig("full")
-            .first { it !is com.flagship.sdk.core.models.Result.Loading }
+        try {
+            val fullResult = (transport as? com.flagship.sdk.plugins.transport.http.FlagshipHttpTransport)
+                ?.fetchConfigDirect("full")
+                ?: com.flagship.sdk.core.models.Result.Error(0, "Transport not available")
 
-        when (fullResult) {
-            is com.flagship.sdk.core.models.Result.Error -> {
-            }
-            is com.flagship.sdk.core.models.Result.Success<FeatureFlagsSchema> -> {
-                val timestamp = extractTimestampFromHeaders(fullResult.headers)
+            when (fullResult) {
+                is com.flagship.sdk.core.models.Result.Error -> {
+                }
+                is com.flagship.sdk.core.models.Result.Success<FeatureFlagsSchema> -> {
+                    val newTimestamp = extractTimestampFromHeaders(fullResult.headers)
 
-                if (timestamp != null) {
                     Log.d("Flagship", "CONFIG CHANGED")
                     
                     cache.invalidateNamespace()
+                    configCache.invalidateNamespace()
                     configCache.putAll(fullResult.data.features.associateBy { it.key })
                     
                     val snapShot =
                         ConfigSnapshot(
                             namespace = "default",
                             createdAt = System.currentTimeMillis(),
-                            etag = timestamp.toString(),
+                            etag = newTimestamp?.toString() ?: System.currentTimeMillis().toString(),
                             json = JsonUtility.toJson(fullResult.data),
                         )
                     store.replace(snapShot)
                     
-                    persistentCache.put(
-                        SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS,
-                        timestamp,
-                    )
+                    if (newTimestamp != null) {
+                        persistentCache.put(
+                            SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS,
+                            newTimestamp,
+                        )
+                    }
+                }
+                else -> {
                 }
             }
-            else -> Unit
+        } catch (e: Exception) {
         }
     }
 
     private suspend fun syncWithTimeOnlyCheck() {
-        val timeOnlyResult = transport
-            .fetchConfig("time-only")
-            .first { it !is com.flagship.sdk.core.models.Result.Loading }
+        val timeOnlyResult = (transport as? com.flagship.sdk.plugins.transport.http.FlagshipHttpTransport)
+            ?.fetchConfigDirect("time-only")
+            ?: com.flagship.sdk.core.models.Result.Error(0, "Transport not available")
 
         when (timeOnlyResult) {
             is com.flagship.sdk.core.models.Result.Error -> {
@@ -111,9 +118,10 @@ class Repository(
                     val timestampChanged = newTimestamp != storedTimestamp
 
                     if (timestampChanged) {
+                        Log.d("Flagship", "CONFIG CHANGED")
                         syncWithFullConfig()
                     } else {
-                        Log.d("Flagship", "+++ CONFIG UNCHANGED")
+                        Log.d("Flagship", "CONFIG UNCHANGED")
                     }
                 }
             }
