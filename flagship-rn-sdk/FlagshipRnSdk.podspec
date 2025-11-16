@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm,cpp,swift}"
   s.private_header_files = "ios/**/*.h"
   s.public_header_files = "ios/FlagshipRnSdk.h"
-  s.dependency "FlagshipFeatureFlags", "0.2.93"
+  s.dependency "FlagshipFeatureFlags", "0.2.94"
 
   s.swift_version = "5.5"
 

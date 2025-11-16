@@ -85,7 +85,7 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
-  implementation("com.dream11:flagship-sdk:0.0.63") {
+  implementation("com.dream11:flagship-sdk:0.0.64") {
     transitive = true
   }
   implementation "com.facebook.react:react-android"
