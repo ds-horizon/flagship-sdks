@@ -1,70 +1,75 @@
+#import "FlagshipRnSdk.h"
 #import <React/RCTBridgeModule.h>
-
-#ifdef RCT_NEW_ARCH_ENABLED
 #import "FlagshipRnSdkSpec.h"
-#endif
 
-#ifdef RCT_NEW_ARCH_ENABLED
-@interface RCT_EXTERN_MODULE (FlagshipRnSdk,
-                              NSObject <NativeFlagshipRnSdkSpec>)
-#else
-@interface RCT_EXTERN_MODULE (FlagshipRnSdk,
-                              NSObject <RCTBridgeModule>)
-#endif
+@class FlagshipRnSdkImpl;
 
-+ (BOOL)requiresMainQueueSetup {
-  return NO;
+@interface FlagshipRnSdkImpl : NSObject
++ (instancetype)shared;
+- (NSNumber *)multiply:(double)a b:(double)b;
+- (void)initialize:(NSDictionary *)config resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
+- (NSNumber *)setContext:(NSDictionary *)context;
+- (NSNumber *)getBooleanValue:(NSString *)key defaultValue:(BOOL)defaultValue;
+- (NSString *)getStringValue:(NSString *)key defaultValue:(NSString *)defaultValue;
+- (NSNumber *)getIntegerValue:(NSString *)key defaultValue:(double)defaultValue;
+- (NSNumber *)getDoubleValue:(NSString *)key defaultValue:(double)defaultValue;
+- (NSDictionary *)getObjectValue:(NSString *)key defaultValue:(NSDictionary *)defaultValue;
+@end
+
+@interface FlagshipRnSdk ()
+#ifdef __has_include
+#if __has_include("FlagshipRnSdkSpec.h")
+<NativeFlagshipRnSdkSpec>
+#endif
+#endif
+@end
+
+@implementation FlagshipRnSdk
+
+- (NSNumber *)multiply:(double)a b:(double)b {
+  return [[FlagshipRnSdkImpl shared] multiply:a b:b];
 }
 
-RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(multiply
-                                        : (double)a
-                                        b: (double)b)
+- (void)initialize:(NSDictionary *)config
+           resolve:(RCTPromiseResolveBlock)resolve
+            reject:(RCTPromiseRejectBlock)reject {
+  [[FlagshipRnSdkImpl shared] initialize:config resolve:resolve reject:reject];
+}
 
-RCT_EXTERN_METHOD(initialize
-                  : (NSDictionary *)config resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
+- (NSNumber *)setContext:(NSDictionary *)context {
+  return [[FlagshipRnSdkImpl shared] setContext:context];
+}
 
-RCT_EXTERN_METHOD(setContext
-                  : (NSDictionary *)context resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
+- (NSNumber *)getBooleanValue:(NSString *)key defaultValue:(BOOL)defaultValue {
+  return [[FlagshipRnSdkImpl shared] getBooleanValue:key defaultValue:defaultValue];
+}
 
-RCT_EXTERN_METHOD(getBooleanValue
-                  : (NSString *)key defaultValue
-                  : (BOOL)defaultValue resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
+- (NSString *)getStringValue:(NSString *)key defaultValue:(NSString *)defaultValue {
+  return [[FlagshipRnSdkImpl shared] getStringValue:key defaultValue:defaultValue];
+}
 
-RCT_EXTERN_METHOD(getStringValue
-                  : (NSString *)key defaultValue
-                  : (NSString *)defaultValue resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
+- (NSNumber *)getIntegerValue:(NSString *)key defaultValue:(double)defaultValue {
+  return [[FlagshipRnSdkImpl shared] getIntegerValue:key defaultValue:defaultValue];
+}
 
-RCT_EXTERN_METHOD(getIntegerValue
-                  : (NSString *)key defaultValue
-                  : (NSNumber *)defaultValue resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
+- (NSNumber *)getDoubleValue:(NSString *)key defaultValue:(double)defaultValue {
+  return [[FlagshipRnSdkImpl shared] getDoubleValue:key defaultValue:defaultValue];
+}
 
-RCT_EXTERN_METHOD(getDoubleValue
-                  : (NSString *)key defaultValue
-                  : (NSNumber *)defaultValue resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
+- (NSDictionary *)getObjectValue:(NSString *)key defaultValue:(NSDictionary *)defaultValue {
+  return [[FlagshipRnSdkImpl shared] getObjectValue:key defaultValue:defaultValue];
+}
 
-RCT_EXTERN_METHOD(getObjectValue
-                  : (NSString *)key defaultValue
-                  : (NSDictionary *)defaultValue resolver
-                  : (RCTPromiseResolveBlock)resolve rejecter
-                  : (RCTPromiseRejectBlock)reject)
-
-#ifdef RCT_NEW_ARCH_ENABLED
+#if __has_include("FlagshipRnSdkSpec.h")
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
   return std::make_shared<facebook::react::NativeFlagshipRnSdkSpecJSI>(params);
 }
 #endif
 
++ (NSString *)moduleName {
+  return @"FlagshipRnSdk";
+}
+
 @end
+
