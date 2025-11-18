@@ -13,99 +13,79 @@ object FlagshipEvaluationManager {
   fun getBooleanValue(
     key: String?,
     defaultValue: Boolean,
-    promise: Promise?,
-  ) {
-    try {
+  ): Boolean {
+    return try {
       val client = OpenFeatureAPI.getClient()
       key?.let {
-        val result = client.getBooleanValue(key, defaultValue)
-        promise?.resolve(result)
-      } ?: run {
-        promise?.reject("KEY_NULL", "Key is null", null)
-      }
+        client.getBooleanValue(key, defaultValue)
+      } ?: defaultValue
     } catch (e: Exception) {
-      promise?.reject("GET_BOOLEAN_ERROR", e.message ?: "getBooleanValue failed", e)
+      defaultValue
     }
   }
 
   fun getStringValue(
     key: String?,
     defaultValue: String?,
-    promise: Promise?,
-  ) {
-    try {
+  ): String {
+    return try {
       val client = OpenFeatureAPI.getClient()
       key?.let {
         val safeDefault = defaultValue ?: ""
-        val result = client.getStringValue(key, safeDefault)
-        promise?.resolve(result)
-      } ?: run {
-        promise?.reject("KEY_NULL", "Key is null", null)
-      }
+        client.getStringValue(key, safeDefault)
+      } ?: (defaultValue ?: "")
     } catch (e: Exception) {
-      promise?.reject("GET_STRING_ERROR", e.message ?: "getStringValue failed", e)
+      defaultValue ?: ""
     }
   }
 
   fun getIntegerValue(
     key: String?,
     defaultValue: Double,
-    promise: Promise?,
-  ) {
-    try {
+  ): Int {
+    return try {
       val client = OpenFeatureAPI.getClient()
       key?.let {
         val defaultInt = defaultValue.toInt()
         val result = client.getIntegerValue(key, defaultInt)
-        val asInt = when (result) {
+        when (result) {
           is Int -> result
           is Long -> result.toInt()
           else -> defaultInt
         }
-        promise?.resolve(asInt)
-      } ?: run {
-        promise?.reject("KEY_NULL", "Key is null", null)
-      }
+      } ?: defaultValue.toInt()
     } catch (e: Exception) {
-      promise?.reject("GET_INTEGER_ERROR", e.message ?: "getIntegerValue failed", e)
+      defaultValue.toInt()
     }
   }
 
   fun getDoubleValue(
     key: String?,
     defaultValue: Double,
-    promise: Promise?,
-  ) {
-    try {
+  ): Double {
+    return try {
       val client = OpenFeatureAPI.getClient()
       key?.let {
-        val result = client.getDoubleValue(key, defaultValue)
-        promise?.resolve(result)
-      } ?: run {
-        promise?.reject("KEY_NULL", "Key is null", null)
-      }
+        client.getDoubleValue(key, defaultValue)
+      } ?: defaultValue
     } catch (e: Exception) {
-      promise?.reject("GET_DOUBLE_ERROR", e.message ?: "getDoubleValue failed", e)
+      defaultValue
     }
   }
 
   fun getObjectValue(
     key: String?,
     defaultValue: ReadableMap?,
-    promise: Promise?,
-  ) {
-    try {
+  ): Any? {
+    return try {
       val client = OpenFeatureAPI.getClient()
       key?.let {
         val defaultObject = convertReadableMapToValue(defaultValue)
         val result = client.getObjectValue(key, defaultObject)
-        val reactValue = convertValueToReact(result)
-        promise?.resolve(reactValue)
-      } ?: run {
-        promise?.reject("KEY_NULL", "Key is null", null)
-      }
+        convertValueToReact(result)
+      } ?: convertValueToReact(convertReadableMapToValue(defaultValue))
     } catch (e: Exception) {
-      promise?.reject("GET_OBJECT_ERROR", e.message ?: "getObjectValue failed", e)
+      convertValueToReact(convertReadableMapToValue(defaultValue))
     }
   }
 

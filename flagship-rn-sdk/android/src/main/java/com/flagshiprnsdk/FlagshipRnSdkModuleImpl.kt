@@ -28,57 +28,47 @@ class FlagshipRnSdkModuleImpl(
     }
   }
 
-  fun setContext(
-    context: ReadableMap,
-    promise: Promise?,
-  ) {
-    try {
-      FlagshipContextManager.setContext(context)
-      promise?.resolve(true)
-    } catch (e: Exception) {
-      println("FlagshipRnSdk: setContext failed: ${e.message}")
-      promise?.reject("SET_CONTEXT_ERROR", e.message ?: "setContext failed", e)
-    }
+  fun setContext(context: ReadableMap): Boolean = try {
+    FlagshipContextManager.setContext(context)
+    true
+  } catch (e: Exception) {
+    println("FlagshipRnSdk: setContext failed: ${e.message}")
+    false
   }
 
   fun getBooleanValue(
     key: String?,
     defaultValue: Boolean,
-    promise: Promise?,
-  ) {
-    FlagshipEvaluationManager.getBooleanValue(key, defaultValue, promise)
+  ): Boolean {
+    return FlagshipEvaluationManager.getBooleanValue(key, defaultValue)
   }
 
   fun getStringValue(
     key: String?,
     defaultValue: String?,
-    promise: Promise?,
-  ) {
-    FlagshipEvaluationManager.getStringValue(key, defaultValue, promise)
+  ): String {
+    return FlagshipEvaluationManager.getStringValue(key, defaultValue)
   }
 
   fun getIntegerValue(
     key: String?,
     defaultValue: Double,
-    promise: Promise?,
-  ) {
-    FlagshipEvaluationManager.getIntegerValue(key, defaultValue, promise)
+  ): Double {
+    return FlagshipEvaluationManager.getIntegerValue(key, defaultValue).toDouble()
   }
 
   fun getDoubleValue(
     key: String?,
     defaultValue: Double,
-    promise: Promise?,
-  ) {
-    FlagshipEvaluationManager.getDoubleValue(key, defaultValue, promise)
+  ): Double {
+    return FlagshipEvaluationManager.getDoubleValue(key, defaultValue)
   }
 
   fun getObjectValue(
     key: String?,
     defaultValue: ReadableMap?,
-    promise: Promise?,
-  ) {
-    FlagshipEvaluationManager.getObjectValue(key, defaultValue, promise)
+  ): Any? {
+    return FlagshipEvaluationManager.getObjectValue(key, defaultValue)
   }
 
   companion object {

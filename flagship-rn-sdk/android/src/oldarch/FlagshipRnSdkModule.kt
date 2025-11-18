@@ -23,14 +23,14 @@ class FlagshipRnSdkModule(
     flagshipRnSdkModuleImpl.initialize(config, promise)
   }
 
-  @ReactMethod
-  fun setContext(context: ReadableMap, promise: Promise) {
-    flagshipRnSdkModuleImpl.setContext(context, promise)
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun setContext(context: ReadableMap): Boolean {
+    return flagshipRnSdkModuleImpl.setContext(context)
   }
 
-  @ReactMethod
-  fun getBooleanValue(key: String, defaultValue: Boolean, promise: Promise) {
-    flagshipRnSdkModuleImpl.getBooleanValue(key, defaultValue, promise)
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun getBooleanValue(key: String, defaultValue: Boolean): Boolean {
+    return flagshipRnSdkModuleImpl.getBooleanValue(key, defaultValue)
   }
 
   @ReactMethod
