@@ -47,6 +47,7 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
 
         // Set default values
         etTargetingKey.setText("3456")
+        etFlagKey.setText("dark_mode_toggle")
     }
 
     private fun initFlagshipClient() {
@@ -58,7 +59,7 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
                     tenantId = "tenant1", // Default tenant, can be changed
                     refreshInterval =
                         java.util.concurrent.TimeUnit.SECONDS
-                            .toMillis(10),
+                            .toMillis(30),
                 )
 
             flagshipClient = FlagShipClient.getInstance("test-domain", config)
@@ -311,6 +312,7 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
             "session_count" to 150.0,
             "region" to "US",
             "userId" to 3456,
-            "app_version" to "2.3.0"
+            "app_version" to "2.3.0",
+            "user_tags" to listOf("early-adopter", "beta-tester", "premium")
         )
 }

@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         // This avoids the Core Data setup complexity
         let config = FlagshipFeatureConfig(
             baseURL: "http://localhost:8080",
-            refreshInterval: 60,
+            refreshInterval: 10,
             tenantId: "tenant1"
         )
         
@@ -58,7 +58,12 @@ class ViewController: UIViewController {
             "session_count": Value.integer(150),
             "region": Value.string("US"),
             "userId": Value.integer(3456),
-            "app_version": Value.string("2.3.0")
+            "app_version": Value.string("2.3.0"),
+            "user_tags": Value.list([
+                Value.string("early-adopter"),
+                Value.string("beta-tester"),
+                Value.string("premium")
+            ])
         ]))
         OpenFeatureAPI.shared.setEvaluationContext(evaluationContext: context)
         
@@ -100,6 +105,7 @@ class ViewController: UIViewController {
         stackView.addArrangedSubview(inputLabel)
         
         flagNameTextField = UITextField()
+        flagNameTextField.text = "dark_mode_toggle"
         flagNameTextField.placeholder = "e.g., dark_mode_toggle"
         flagNameTextField.borderStyle = .roundedRect
         flagNameTextField.font = UIFont.systemFont(ofSize: 16)

@@ -9,7 +9,7 @@ A React Native SDK for managing feature flags with support for dynamic configura
 - ✅ **Context-Based Targeting**: Evaluate flags based on user context
 - ✅ **Multiple Value Types**: Support for boolean, string, integer, double, and object values
 - ✅ **Auto-Refresh**: Configurable polling interval for flag updates
-- ✅ **Expo Compatible**: Automatic plugin configuration for Expo projects
+- ✅ **Expo Compatible**: Works seamlessly with Expo projects
 - ✅ **Cross-Platform**: Works on both iOS and Android
 
 ## Installation
@@ -35,45 +35,38 @@ yarn add @d11/flagship-rn-sdk
 cd ios && pod install && cd ..
 ```
 
-2. The SDK automatically configures the necessary Podfile settings for dynamic frameworks.
+2. The SDK automatically configures the necessary Podfile settings for static frameworks.
 
 #### Android
 
-No additional setup required. The SDK is automatically linked.
+The SDK requires GitHub credentials to access the Android SDK dependency from GitHub Packages. You need to set these credentials before building your Android app.
 
-### Expo
+**Option 1: Using Environment Variables (Recommended)**
 
-The SDK includes an Expo config plugin that automatically configures your project. The plugin is applied automatically when you install the package.
+Set the following environment variables in your system:
 
-**For Expo projects:**
-
-1. Install the package:
 ```sh
-npx expo install @d11/flagship-rn-sdk
+export GITHUB_USERNAME=your-github-username
+export GITHUB_TOKEN=your-github-pat-token
 ```
 
-2. Run prebuild (if using bare workflow or custom native code):
-```sh
-npx expo prebuild
+**Option 2: Using Gradle Properties**
+
+Add the credentials to your `android/gradle.properties` file (or `~/.gradle/gradle.properties` for global configuration):
+
+```properties
+GITHUB_USERNAME=your-github-username
+GITHUB_TOKEN=your-github-pat-token
 ```
 
-The plugin automatically:
-- Configures `use_frameworks!` in your Podfile
-- Sets up `BUILD_LIBRARY_FOR_DISTRIBUTION` for required dependencies
+**When are credentials needed?**
 
-**Manual Configuration (Optional):**
+- During `gradle build` or `./gradlew build`
+- When running `npm run android` or `yarn android`
+- When Android Studio syncs the project
+- During CI/CD builds
 
-If you need to manually configure the plugin, add it to your `app.json`:
-
-```json
-{
-  "expo": {
-    "plugins": [
-      "@d11/flagship-rn-sdk/expo-plugin-flagship-rn-sdk.js"
-    ]
-  }
-}
-```
+**Note:** The credentials are only used to download the Android SDK dependency from GitHub Packages. They are not included in your app bundle.
 
 ## Usage
 
@@ -324,23 +317,6 @@ If you encounter build issues on iOS:
 1. Clean build folder: `cd ios && xcodebuild clean && cd ..`
 2. Reinstall pods: `cd ios && pod deintegrate && pod install && cd ..`
 3. Ensure deployment target is iOS 15.1 or higher
-
-### Expo Plugin Not Working
-
-If the Expo plugin doesn't apply automatically:
-
-1. Manually add to `app.json`:
-```json
-{
-  "expo": {
-    "plugins": [
-      "@d11/flagship-rn-sdk/expo-plugin-flagship-rn-sdk.js"
-    ]
-  }
-}
-```
-
-2. Run `npx expo prebuild --clean`
 
 ### Default Values Always Returned
 

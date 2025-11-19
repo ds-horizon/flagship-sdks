@@ -1,12 +1,12 @@
 package com.flagship.sdk.facade
 
+import android.util.Log
 import com.flagship.sdk.core.contracts.IEvaluator
 import com.flagship.sdk.core.contracts.IRepository
 import com.flagship.sdk.core.models.EvaluationContext
 import com.flagship.sdk.core.models.EvaluationResult
 import com.flagship.sdk.core.models.Reason
 import com.flagship.sdk.core.registry.Registry
-import com.flagship.sdk.facade.coroutines.DefaultDispatchers
 import com.flagship.sdk.facade.coroutines.SdkScope
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -21,13 +21,15 @@ class FlagShipClient(
 
     init {
         SdkScope.init()
-        registry = Registry(domain, config, SdkScope.scope, DefaultDispatchers)
+        registry = Registry(domain, config, SdkScope.scope)
         registry.create()
         repository =
             registry.getRepository()?.also {
                 it.init()
             }
         evaluator = registry.getEvaluator()
+        registry.startPolling()
+        Log.d("Flagship", "SDK INITIALIZED")
     }
 
     fun getBoolean(
@@ -125,6 +127,7 @@ class FlagShipClient(
         newContext: Map<String, Any?>,
     ) {
         repository?.onContextChanged(oldContext, newContext)
+        Log.d("Flagship", "CONTEXT SET")
     }
 
     fun shutDown() {

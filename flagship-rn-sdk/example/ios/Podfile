@@ -15,7 +15,8 @@ if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
   use_frameworks! :linkage => linkage.to_sym
 else
-  use_frameworks!
+  Pod::UI.puts "Configuring Pod with statically linked Frameworks".green
+  use_frameworks! :linkage => :static
 end
 
 target 'FlagshipRnSdkExample' do
@@ -36,13 +37,6 @@ target 'FlagshipRnSdkExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
-
-    installer.pods_project.targets.each do |target|
-      if target.name == 'FlagshipFeatureFlags' || target.name == 'OpenFeature'
-        target.build_configurations.each do |config|
-          config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-        end
-      end
-    end
+    
   end
 end

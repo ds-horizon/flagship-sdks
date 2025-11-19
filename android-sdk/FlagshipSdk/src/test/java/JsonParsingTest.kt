@@ -46,7 +46,7 @@ class JsonParsingTest {
             assert(result.features.size == 2)
             val first = result.features[0]
             assert(first.key.isNotEmpty())
-            assert(first.defaultRule.allocation.isNotEmpty())
+            assert(first.defaultRule?.allocation?.isNotEmpty() == true)
             assert(first.variants.isNotEmpty())
             val second = result.features[1]
             assert(!second.enabled)
@@ -89,7 +89,7 @@ class JsonParsingTest {
             assert(result.features.size == 1)
             val flag = result.features.first()
             assert(flag.key == "test-flag")
-            assert(flag.defaultRule.allocation[0].variantKey == "off")
+            assert(flag.defaultRule?.allocation?.get(0)?.variantKey == "off")
             println("✅ Minimal flag parsing successful: ${result.features.first().key}")
         } catch (e: Exception) {
             println("❌ Minimal flag parsing failed: ${e.message}")
@@ -275,7 +275,7 @@ class JsonParsingTest {
             assert(simpleToggle.type.name.lowercase() == "boolean")
             assert(simpleToggle.variants.size == 2)
             assert(simpleToggle.rules.isEmpty())
-            assert(simpleToggle.defaultRule.allocation.size == 1)
+            assert(simpleToggle.defaultRule?.allocation?.size == 1)
 
             // Validate second flag
             val featureMessage = result.features[1]
@@ -431,7 +431,7 @@ class JsonParsingTest {
             assert(smallVariant != null)
             assert(smallVariant?.value is VariantValue.DoubleValue)
             assert((smallVariant?.value as VariantValue.DoubleValue).value == 5.0)
-            assert(uploadSize.defaultRule.allocation.isNotEmpty())
+            assert(uploadSize.defaultRule?.allocation?.isNotEmpty() == true)
 
             println("  - All comprehensive validations passed")
         } catch (e: Exception) {
@@ -525,7 +525,7 @@ class JsonParsingTest {
             assert(minimalFlag.rolloutPercentage == 0L)
             assert(minimalFlag.variants.size == 1)
             assert(minimalFlag.rules.isEmpty())
-            assert(minimalFlag.defaultRule.allocation.size == 1)
+            assert(minimalFlag.defaultRule?.allocation?.size == 1)
 
             // Validate boundary values
             val boundaryFlag = result.features[1]
@@ -608,7 +608,7 @@ class JsonParsingTest {
 
             val apiConfig = result.features[0]
             assert(apiConfig.key == "api_config")
-            assert(apiConfig.defaultRule.allocation.isNotEmpty())
+            assert(apiConfig.defaultRule?.allocation?.isNotEmpty() == true)
 
             val prodVariant = apiConfig.variants.find { it.key == "production" }
             assert(prodVariant?.value is VariantValue.AnythingMapValue)
@@ -738,7 +738,7 @@ class JsonParsingTest {
             assert(rules[1].constraints[0].operator == Operator.Gt)
             assert(rules[2].constraints[0].operator == Operator.Lt)
             assert(rules[3].constraints[0].operator == Operator.In)
-            assert(result.features[0].defaultRule.allocation.isNotEmpty())
+            assert(result.features[0].defaultRule?.allocation?.isNotEmpty() == true)
 
             // Test different constraint value types
             assert(rules[0].constraints[0].value is ConstraintValue.StringValue)
@@ -902,7 +902,7 @@ class JsonParsingTest {
 
             val variants = result.features[0].variants
             assert(variants.size == 4)
-            assert(result.features[0].defaultRule.allocation.isNotEmpty())
+            assert(result.features[0].defaultRule?.allocation?.isNotEmpty() == true)
 
             // Validate variant value types
             val stringVariant = variants.find { it.key == "string_variant" }

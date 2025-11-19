@@ -15,7 +15,7 @@
     "run:android": "npx expo run:android"
   },
   "dependencies": {
-    "@d11/flagship-rn-sdk": "^0.2.0",
+    "@d11/flagship-rn-sdk": "^0.2.3",
     "@expo/vector-icons": "^15.0.3",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",

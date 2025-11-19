@@ -46,11 +46,8 @@ object AllocationUtility {
         // Generate deterministic hash based on flagKey and targetingKey
         val hashValue = generateHash(key, targetingKey, ruleName)
 
-        Log.d("HashValue " , hashValue.toString());
-
         // Convert hash to a percentage (0-99)
         val userPercentile = (hashValue % 100).toInt()
-        Log.d("HashValue " , "User Percentile $userPercentile");
 
         // Find which bucket this user falls into
         var cumulativePercentage = 0L
@@ -83,7 +80,6 @@ object AllocationUtility {
         } ?: run {
             "$flagKey:$targetingKey"
         }
-        Log.d("AllocationUtility" , "Input value= $input")
         val digest = MessageDigest.getInstance("MD5")
         val hashBytes = digest.digest(input.toByteArray(Charsets.UTF_8))
 

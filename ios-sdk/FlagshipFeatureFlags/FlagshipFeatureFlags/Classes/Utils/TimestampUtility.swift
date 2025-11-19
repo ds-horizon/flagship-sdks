@@ -19,7 +19,7 @@ public class TimestampUtility {
         guard let storedTimestamp = getStoredTimestamp() else {
             return true
         }
-        return newTimestamp > storedTimestamp
+        return newTimestamp != storedTimestamp
     }
     
     public static func clearTimestamp() {

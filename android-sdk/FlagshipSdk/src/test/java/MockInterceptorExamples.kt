@@ -1,7 +1,6 @@
 package com.flagship.sdk.plugins.transport.http
 
 import com.flagship.sdk.core.models.Result
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -20,12 +19,10 @@ object MockInterceptorExamples {
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
                     tenantId = "",
-                    pollingInterval = 10000,
                     baseUrl = "https://google.com",
                 )
 
-            // Fetch feature flags (will return mocked data)
-            val result = transport.fetchConfig("full").first()
+            val result = transport.fetchConfig("full")
 
             when (result) {
                 is Result.Success -> {
@@ -53,11 +50,10 @@ object MockInterceptorExamples {
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
                     tenantId = "",
-                    pollingInterval = 10000,
                     baseUrl = "https://google.com",
                 )
 
-            val result = transport.fetchConfig("full").first()
+            val result = transport.fetchConfig("full")
 
             when (result) {
                 is Result.Success -> println("✅ Unexpected success")
@@ -78,12 +74,11 @@ object MockInterceptorExamples {
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
                     tenantId = "",
-                    pollingInterval = 10000,
                     baseUrl = "https://google.com",
                 )
 
             val startTime = System.currentTimeMillis()
-            val result = transport.fetchConfig("full").first()
+            val result = transport.fetchConfig("full")
             val endTime = System.currentTimeMillis()
 
             println("⏱️ Request took ${endTime - startTime}ms")
@@ -127,11 +122,10 @@ object MockInterceptorExamples {
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
                     tenantId = "",
-                    pollingInterval = 10000,
                     baseUrl = "https://google.com",
                 )
 
-            val result = transport.fetchConfig("full").first()
+            val result = transport.fetchConfig("full")
 
             when (result) {
                 is Result.Success -> {
@@ -174,11 +168,10 @@ object MockInterceptorExamples {
                         mockInterceptors = listOf(mockInterceptor),
                         enableLogging = true,
                         tenantId = "",
-                        pollingInterval = 10000,
                         baseUrl = "https://google.com",
                     )
 
-                val result = transport.fetchConfig("full").first()
+                val result = transport.fetchConfig("full")
 
                 when (result) {
                     is Result.Success -> println("   ✅ Success")

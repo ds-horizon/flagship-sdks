@@ -3,14 +3,13 @@ PODS:
   - DoubleConversion (1.1.6)
   - fast_float (6.1.4)
   - FBLazyVector (0.79.2)
-  - FlagshipFeatureFlags (0.2.91):
+  - FlagshipFeatureFlags (0.2.94):
     - OpenFeature (= 0.3.0)
-  - FlagshipRnSdk (0.1.0):
+  - FlagshipRnSdk (0.2.4):
     - DoubleConversion
-    - FlagshipFeatureFlags (= 0.2.91)
+    - FlagshipFeatureFlags (= 0.2.94)
     - glog
     - hermes-engine
-    - OpenFeature (= 0.3.0)
     - RCT-Folly (= 2024.11.18.00)
     - RCTRequired
     - RCTTypeSafety
@@ -1917,8 +1916,8 @@ SPEC CHECKSUMS:
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
   FBLazyVector: 84b955f7b4da8b895faf5946f73748267347c975
-  FlagshipFeatureFlags: b23f20ddf2c02f9e6d7e3ef140ce880564ba40cf
-  FlagshipRnSdk: 30c3ab02492d426c5f889395198b6c6319816f3c
+  FlagshipFeatureFlags: a890ab6225a1b2f848d32d082285dcc2f6fd696d
+  FlagshipRnSdk: 84bf5e4786ba3d489b12fb76c7b244df1b16bc06
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 314be5250afa5692b57b4dd1705959e1973a8ebe
@@ -1988,6 +1987,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 50518ade05048235d91a78b803336dbb5b159d5d
 
-PODFILE CHECKSUM: d80cfed114e85d86ffffcb9a3765b2e8835cb766
+PODFILE CHECKSUM: 063c3a70bdd83b2c6b2426683d28058d13759672
 
 COCOAPODS: 1.15.2

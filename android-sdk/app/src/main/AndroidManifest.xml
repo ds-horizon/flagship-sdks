@@ -33,7 +33,7 @@
             android:name=".TestOpenFeatureActivity"
             android:exported="true"
             android:label="OpenFeature Tester"
-            android:theme="@style/Theme.AppCompat.DayNight" />
+            android:theme="@style/Theme.Androidsdk" />
     </application>
 
 </manifest>

@@ -23,7 +23,7 @@ Both platforms follow [Semantic Versioning](https://semver.org/) with platform-s
 ./scripts/next-version.sh android minor --create
 
 # 3. Monitor the release at:
-# https://github.com/dream11/flagship-sdk/actions
+# https://github.com/ds-horizon/flagship-sdks/actions
 ```
 
 ## Release Process
@@ -98,8 +98,8 @@ Once the tag is pushed, GitHub Actions will automatically:
 
 After the workflow completes:
 
-1. Check [GitHub Releases](https://github.com/dream11/flagship-sdk/releases) for the new release
-2. Verify the package appears in [GitHub Packages](https://github.com/dream11/flagship-sdk/packages)
+1. Check [GitHub Releases](https://github.com/ds-horizon/flagship-sdks/releases) for the new release
+2. Verify the package appears in [GitHub Packages](https://github.com/ds-horizon/flagship-sdks/packages)
 3. Test integration in a sample project
 
 ## Maintenance Releases (Hotfixes)
@@ -136,7 +136,7 @@ Add to your app's `build.gradle.kts`:
 ```kotlin
 repositories {
     maven {
-        url = uri("https://maven.pkg.github.com/dream11/flagship-sdk")
+        url = uri("https://maven.pkg.github.com/ds-horizon/flagship-sdks")
         credentials {
             username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
@@ -158,7 +158,7 @@ Add to your `Podfile`:
 pod 'FlagshipFeatureFlags', '~> 0.1.0'
 
 # Or download framework from GitHub Releases
-# https://github.com/dream11/flagship-sdk/releases
+# https://github.com/ds-horizon/flagship-sdks/releases
 ```
 
 ### Authentication
@@ -207,7 +207,7 @@ If a tag was created but the GitHub Actions workflow failed:
 
 1. **Re-run from GitHub Actions** (Recommended)
 
-   - Go to: https://github.com/dream11/flagship-sdk/actions
+   - Go to: https://github.com/ds-horizon/flagship-sdks/actions
    - Find the failed workflow run
    - Click "Re-run jobs" or "Re-run failed jobs"
 
@@ -238,7 +238,7 @@ If a tag was created but the GitHub Actions workflow failed:
 
 1. Ensure you have access to the repository
 2. Check GitHub token has `read:packages` permission
-3. Verify the package exists in [GitHub Packages](https://github.com/dream11/flagship-sdk/packages)
+3. Verify the package exists in [GitHub Packages](https://github.com/ds-horizon/flagship-sdks/packages)
 
 ### Version Conflicts
 

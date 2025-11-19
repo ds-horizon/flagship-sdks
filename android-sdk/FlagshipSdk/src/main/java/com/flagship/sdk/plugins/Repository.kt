@@ -1,19 +1,16 @@
 package com.flagship.sdk.plugins
 
+import android.util.Log
 import com.flagship.sdk.core.contracts.ICache
 import com.flagship.sdk.core.contracts.IRepository
 import com.flagship.sdk.core.contracts.IStore
 import com.flagship.sdk.core.contracts.ITransport
 import com.flagship.sdk.core.models.Feature
 import com.flagship.sdk.core.models.FeatureFlagsSchema
-import com.flagship.sdk.facade.coroutines.DispatcherProvider
-import com.flagship.sdk.plugins.storage.sharedPref.SharedPreferencesKeys
+import com.flagship.sdk.plugins.storage.TimestampUtility
 import com.flagship.sdk.plugins.storage.sqlite.entities.ConfigSnapshot
 import com.flagship.sdk.plugins.storage.sqlite.utility.JsonUtility
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class Repository(
@@ -23,9 +20,9 @@ class Repository(
     private val store: IStore<ConfigSnapshot>,
     private val transport: ITransport,
     private val scope: CoroutineScope,
-    private val dispatcher: DispatcherProvider,
-    private val refreshInterval: Long = 30000,
 ) : IRepository {
+    private val timestampUtility = TimestampUtility(persistentCache)
+
     override fun init() {
         scope.launch {
             val snapShot = store.current()
@@ -33,63 +30,65 @@ class Repository(
                 val features = JsonUtility.fromJson<FeatureFlagsSchema>(snapShot.json).features
                 configCache.putAll(features.associateBy { it.key })
             }
-            startPolling()
         }
     }
 
-    private suspend fun startPolling() {
-        fetchConfig(true)
-        while (scope.isActive) {
-            delay(refreshInterval)
-            fetchConfig(false)
+    suspend fun syncFlags() {
+        try {
+            val storedTimestamp = timestampUtility.getStoredTimestamp()
+
+            if (storedTimestamp == null) {
+                syncWithFullConfig()
+            } else {
+                syncWithTimeOnlyCheck()
+            }
+        } catch (e: Exception) {
         }
     }
 
     override suspend fun fetchConfig(isFirstTime: Boolean) {
-        val storedTimestamp = persistentCache.get<Long>(SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS)
-
-        if (storedTimestamp == null) {
-            syncWithFullConfig()
-        } else {
-            syncWithTimeOnlyCheck()
-        }
+        syncFlags()
     }
 
     private suspend fun syncWithFullConfig() {
-        val fullResult = transport
-            .fetchConfig("full")
-            .first { it !is com.flagship.sdk.core.models.Result.Loading }
+        try {
+            Log.d("Flagship", "API CALLED: full")
+            val fullResult = transport.fetchConfig("full")
 
-        when (fullResult) {
-            is com.flagship.sdk.core.models.Result.Error -> {
-            }
-            is com.flagship.sdk.core.models.Result.Success<FeatureFlagsSchema> -> {
-                val timestamp = extractTimestampFromHeaders(fullResult.headers)
+            when (fullResult) {
+                is com.flagship.sdk.core.models.Result.Error -> {
+                }
+                is com.flagship.sdk.core.models.Result.Success<FeatureFlagsSchema> -> {
+                    val newTimestamp = extractTimestampFromHeaders(fullResult.headers)
 
-                if (timestamp != null) {
-                    val snapShot =
-                        ConfigSnapshot(
-                            namespace = "default",
-                            createdAt = System.currentTimeMillis(),
-                            etag = timestamp.toString(),
-                            json = JsonUtility.toJson(fullResult.data),
-                        )
-                    store.replace(snapShot)
-                    configCache.putAll(fullResult.data.features.associateBy { it.key })
-                    persistentCache.put(
-                        SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS,
-                        timestamp,
-                    )
+                    if (newTimestamp != null) {
+                        Log.d("Flagship", "CONFIG CHANGED")
+                        
+                        cache.invalidateNamespace()
+                        configCache.invalidateNamespace()
+                        configCache.putAll(fullResult.data.features.associateBy { it.key })
+                        
+                        val snapShot =
+                            ConfigSnapshot(
+                                namespace = "default",
+                                createdAt = System.currentTimeMillis(),
+                                etag = newTimestamp.toString(),
+                                json = JsonUtility.toJson(fullResult.data),
+                            )
+                        store.replace(snapShot)
+                        timestampUtility.storeTimestamp(newTimestamp)
+                    }
+                }
+                else -> {
                 }
             }
-            else -> Unit
+        } catch (e: Exception) {
         }
     }
 
     private suspend fun syncWithTimeOnlyCheck() {
-        val timeOnlyResult = transport
-            .fetchConfig("time-only")
-            .first { it !is com.flagship.sdk.core.models.Result.Loading }
+        Log.d("Flagship", "API CALLED: time-only")
+        val timeOnlyResult = transport.fetchConfig("time-only")
 
         when (timeOnlyResult) {
             is com.flagship.sdk.core.models.Result.Error -> {
@@ -97,15 +96,12 @@ class Repository(
 
             is com.flagship.sdk.core.models.Result.Success<FeatureFlagsSchema> -> {
                 val newTimestamp = extractTimestampFromHeaders(timeOnlyResult.headers)
-                val storedTimestamp = persistentCache.get<Long>(
-                    SharedPreferencesKeys.FeatureFlags.LAST_SYNC_TIMESTAMP_IN_MILLIS
-                )
 
-                if (newTimestamp != null && storedTimestamp != null) {
-                    val timestampChanged = newTimestamp > storedTimestamp
-
-                    if (timestampChanged) {
+                if (newTimestamp != null) {
+                    if (timestampUtility.hasTimestampChanged(newTimestamp)) {
                         syncWithFullConfig()
+                    } else {
+                        Log.d("Flagship", "CONFIG UNCHANGED")
                     }
                 }
             }
@@ -134,3 +130,5 @@ class Repository(
         cache.invalidateNamespace()
     }
 }
+
+

@@ -204,7 +204,7 @@ if [ "$CREATE_TAG" = true ]; then
         echo ""
         echo -e "${GREEN}✅ Successfully created and pushed tag: $TAG_TO_CREATE${NC}"
         echo -e "${BLUE}🚀 GitHub Actions workflow should start shortly.${NC}"
-        echo -e "${BLUE}📦 Check the progress at: https://github.com/dream11/flagship-sdk/actions${NC}"
+        echo -e "${BLUE}📦 Check the progress at: https://github.com/ds-horizon/flagship-sdks/actions${NC}"
         echo ""
         echo -e "${YELLOW}💡 If the release job fails:${NC}"
         echo "   1. Re-run the failed workflow from GitHub Actions"

@@ -20,6 +20,7 @@ import kotlinx.serialization.json.double
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
+import com.github.zafarkhaja.semver.Version
 
 @Serializable
 data class FeatureFlagsSchema(
@@ -40,7 +41,7 @@ data class Feature(
      * Default rule to be applied if no other rules match or if the flag is disabled.
      */
     @SerialName("default_rule")
-    val defaultRule: DefaultRule,
+    val defaultRule: DefaultRule? = null,
     /**
      * Is the flag enabled or not. If not enabled, then default rule allocation is served
      */
@@ -57,7 +58,7 @@ data class Feature(
     /**
      * List of rules for this feature flag, where order defines priority.
      */
-    val rules: List<Rule>,
+    val rules: List<Rule> = emptyList(),
     /**
      * Type of the flag, which defines the value type of its variants
      */
@@ -70,7 +71,7 @@ data class Feature(
     /**
      * Variants of the flag. All variants will have the same value type
      */
-    val variants: List<VariantElement>,
+    val variants: List<VariantElement> = emptyList(),
 )
 
 /**
@@ -82,7 +83,7 @@ data class DefaultRule(
      * List of variant allocations for the default rule. The sum of all percentages must equal
      * 100.
      */
-    val allocation: List<AllocationElement>,
+    val allocation: List<AllocationElement> = emptyList(),
     /**
      * Unique identifier of the default rule
      */
@@ -111,11 +112,11 @@ data class Rule(
     /**
      * List of variant allocations for this rule. The sum of all percentages must equal 100.
      */
-    val allocations: List<AllocationElement>,
+    val allocations: List<AllocationElement> = emptyList(),
     /**
      * List of constraints for this rule. Logical AND is applied between multiple constraints.
      */
-    val constraints: List<Constraint>,
+    val constraints: List<Constraint> = emptyList(),
     /**
      * Unique identifier of the rule
      */
@@ -147,6 +148,9 @@ enum class Operator {
 
     @SerialName("in")
     In,
+
+    @SerialName("ct")
+    Ct,
 
     @SerialName("lte")
     LTE,
@@ -195,6 +199,10 @@ sealed class ArrayValue {
     data class IntegerValue(
         val value: Long,
     ) : ArrayValue()
+
+    data class SemverValue(
+        val value: String,
+    ) : ArrayValue()
 }
 
 object ArrayValueSerializer : KSerializer<ArrayValue> {
@@ -205,7 +213,14 @@ object ArrayValueSerializer : KSerializer<ArrayValue> {
         val jsonDecoder = decoder as JsonDecoder
         val element = jsonDecoder.decodeJsonElement()
         return when {
-            element is JsonPrimitive && element.isString -> ArrayValue.StringValue(element.content)
+            element is JsonPrimitive && element.isString -> {
+                try {
+                    Version.parse(element.content)
+                    return ArrayValue.SemverValue(element.content)
+                } catch (e: Exception) {
+                    return ArrayValue.StringValue(element.content)
+                }
+            }
             element is JsonPrimitive && element.longOrNull != null -> ArrayValue.IntegerValue(element.long)
             else -> throw SerializationException("Unknown ArrayValue type: $element")
         }
@@ -219,6 +234,7 @@ object ArrayValueSerializer : KSerializer<ArrayValue> {
         when (value) {
             is ArrayValue.StringValue -> jsonEncoder.encodeJsonElement(JsonPrimitive(value.value))
             is ArrayValue.IntegerValue -> jsonEncoder.encodeJsonElement(JsonPrimitive(value.value))
+            is ArrayValue.SemverValue -> jsonEncoder.encodeJsonElement(JsonPrimitive(value.value))
         }
     }
 }
@@ -282,6 +298,7 @@ object ConstraintValueSerializer : KSerializer<ConstraintValue> {
                             when (it) {
                                 is ArrayValue.StringValue -> add(JsonPrimitive(it.value))
                                 is ArrayValue.IntegerValue -> add(JsonPrimitive(it.value))
+                                is ArrayValue.SemverValue -> add(JsonPrimitive(it.value))
                             }
                         }
                     }
