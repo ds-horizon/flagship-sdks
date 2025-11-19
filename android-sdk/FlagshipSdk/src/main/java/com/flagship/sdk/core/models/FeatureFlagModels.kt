@@ -20,6 +20,7 @@ import kotlinx.serialization.json.double
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
+import com.github.zafarkhaja.semver.Version
 
 @Serializable
 data class FeatureFlagsSchema(
@@ -198,6 +199,10 @@ sealed class ArrayValue {
     data class IntegerValue(
         val value: Long,
     ) : ArrayValue()
+
+    data class SemverValue(
+        val value: String,
+    ) : ArrayValue()
 }
 
 object ArrayValueSerializer : KSerializer<ArrayValue> {
@@ -208,7 +213,14 @@ object ArrayValueSerializer : KSerializer<ArrayValue> {
         val jsonDecoder = decoder as JsonDecoder
         val element = jsonDecoder.decodeJsonElement()
         return when {
-            element is JsonPrimitive && element.isString -> ArrayValue.StringValue(element.content)
+            element is JsonPrimitive && element.isString -> {
+                try {
+                    Version.parse(element.content)
+                    return ArrayValue.SemverValue(element.content)
+                } catch (e: Exception) {
+                    return ArrayValue.StringValue(element.content)
+                }
+            }
             element is JsonPrimitive && element.longOrNull != null -> ArrayValue.IntegerValue(element.long)
             else -> throw SerializationException("Unknown ArrayValue type: $element")
         }
@@ -222,6 +234,7 @@ object ArrayValueSerializer : KSerializer<ArrayValue> {
         when (value) {
             is ArrayValue.StringValue -> jsonEncoder.encodeJsonElement(JsonPrimitive(value.value))
             is ArrayValue.IntegerValue -> jsonEncoder.encodeJsonElement(JsonPrimitive(value.value))
+            is ArrayValue.SemverValue -> jsonEncoder.encodeJsonElement(JsonPrimitive(value.value))
         }
     }
 }
@@ -285,6 +298,7 @@ object ConstraintValueSerializer : KSerializer<ConstraintValue> {
                             when (it) {
                                 is ArrayValue.StringValue -> add(JsonPrimitive(it.value))
                                 is ArrayValue.IntegerValue -> add(JsonPrimitive(it.value))
+                                is ArrayValue.SemverValue -> add(JsonPrimitive(it.value))
                             }
                         }
                     }

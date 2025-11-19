@@ -14,6 +14,7 @@ import com.flagship.sdk.core.models.Reason
 import com.flagship.sdk.core.models.Rule
 import com.flagship.sdk.core.models.VariantElement
 import com.flagship.sdk.core.models.VariantValue
+import com.github.zafarkhaja.semver.Version
 
 class EdgeEvaluator(
     private val evaluateCache: ICache,
@@ -298,15 +299,25 @@ class EdgeEvaluator(
         val left = context.attributes[constraint.contextField]
         return when (constraint.operator) {
             Operator.In -> {
-                (constraint.value as? ConstraintValue.AnythingArrayValue)
-                    ?.value
-                    ?.any {
-                        when (it) {
-                            is ArrayValue.StringValue -> it.value == left
-                            is ArrayValue.IntegerValue -> it.value == (left as? Number)?.toLong()
+                (
+                    (constraint.value as? ConstraintValue.AnythingArrayValue)
+                        ?.value
+                        ?.any {
+                            when (it) {
+                                is ArrayValue.StringValue -> it.value == left
+                                is ArrayValue.IntegerValue -> it.value == (left as? Number)?.toLong()
+                                is ArrayValue.SemverValue -> {
+                                    try {
+                                        val leftString = left as? String ?: return false
+                                        compareSemver(leftString, it.value) == 0
+                                    } catch (e: Exception) {
+                                        false
+                                    }
+                                }
+                            }
                         }
-                    }
-                    ?: false
+                        ?: false
+                )
             }
 
             Operator.Ct -> contains(left, constraint.value)
@@ -356,28 +367,56 @@ class EdgeEvaluator(
     private fun eq(
         left: Any?,
         right: ConstraintValue,
-    ): Boolean =
-        when (right) {
+    ): Boolean {
+        return when (right) {
             is ConstraintValue.BoolValue -> left is Boolean && left == right.value
             is ConstraintValue.DoubleValue -> left.toDoubleOrNull()?.let { it == right.value } ?: false
             is ConstraintValue.IntegerValue -> left.toLongOrNull()?.let { it == right.value } ?: false
-            is ConstraintValue.StringValue -> left is String && left == right.value
+            is ConstraintValue.StringValue -> {
+                try {
+                    val leftString = left as? String ?: return false
+                    return compareSemver(leftString, right.value) == 0
+                } catch (e: Exception) {
+                    return left is String && left == right.value
+                }
+            }
+
             is ConstraintValue.AnythingArrayValue -> right.value.any { it == left }
         }
+    }
 
     private fun compare(
         left: Any?,
         right: ConstraintValue,
-    ): Int? =
-        when (right) {
+    ): Int? {
+        return when (right) {
             is ConstraintValue.DoubleValue -> left.toDoubleOrNull()?.compareTo(right.value)
             is ConstraintValue.IntegerValue -> left.toLongOrNull()?.compareTo(right.value)
             is ConstraintValue.StringValue -> {
-                null
+                try {
+                    val leftString = left as? String ?: return null
+                    return compareSemver(leftString, right.value)
+                } catch (e: Exception) {
+                    return null
+                }
             }
 
             else -> null
         }
+    }
+
+    /**
+     * Compares two semver version strings, ignoring build metadata.
+     * @param left The left version string to compare
+     * @param right The right version string to compare
+     * @return A negative integer if left < right, zero if left == right, or a positive integer if left > right
+     * @throws Exception if either version string cannot be parsed as a valid semver
+     */
+    private fun compareSemver(left: String, right: String): Int {
+        val leftVersion = Version.parse(left)
+        val rightVersion = Version.parse(right)
+        return leftVersion.compareToIgnoreBuildMetadata(rightVersion)
+    }
 
     private fun Any?.toDoubleOrNull(): Double? =
         when (this) {

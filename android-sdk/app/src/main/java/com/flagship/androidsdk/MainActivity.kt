@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -57,31 +56,31 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     applicationContext: android.app.Application,
 ) {
+    val defaultContext = remember {
+        mapOf(
+            "user_tier" to "premium",
+            "country" to "US",
+            "user_group" to "beta_testerss",
+            "is_logged_in" to true,
+            "is_accessibility_user" to false,
+            "device" to "mobile",
+            "theme_pref" to "light",
+            "session_count" to 150.0,
+            "region" to "US",
+            "userId" to 3456,
+            "app_version" to "2.5.0",
+            "user_tags" to listOf("early-adopter", "beta-tester", "premium"),
+        )
+    }
+
     var isInitialized by remember { mutableStateOf(false) }
     var initError by remember { mutableStateOf<String?>(null) }
     var darkModeEnabled by remember { mutableStateOf<Boolean?>(null) }
     var stringValue by remember { mutableStateOf<String?>(null) }
     var doubleValue by remember { mutableStateOf<Double?>(null) }
     var objectValue by remember { mutableStateOf<String?>(null) }
-    var contextVariant by remember { mutableStateOf("default") }
+    var semverValue by remember { mutableStateOf<String?>(null) }
     var flagshipClient by remember { mutableStateOf<FlagShipClient?>(null) }
-    var currentContext by remember {
-        mutableStateOf<Map<String, Any?>>(
-            mapOf(
-                "user_tier" to "premium",
-                "country" to "US",
-                "user_group" to "beta_testers",
-                "is_logged_in" to true,
-                "is_accessibility_user" to true,
-                "device" to "mobile",
-                "theme_pref" to "light",
-                "session_count" to 150.0,
-                "region" to "US",
-                "userId" to 3456,
-                "app_version" to "2.3.0",
-            ),
-        )
-    }
 
     LaunchedEffect(Unit) {
         try {
@@ -94,23 +93,6 @@ fun MainScreen(
                 )
             flagshipClient = FlagShipClient.getInstance("test-domain", config)
             isInitialized = true
-
-            val defaultContext =
-                mapOf(
-                    "user_tier" to "premium",
-                    "country" to "US",
-                    "user_group" to "beta_testers",
-                    "is_logged_in" to true,
-                    "is_accessibility_user" to true,
-                    "device" to "mobile",
-                    "theme_pref" to "light",
-                    "session_count" to 150.0,
-                    "region" to "US",
-                    "userId" to 3456,
-                    "app_version" to "2.3.0",
-                    "user_tags" to listOf("early-adopter", "beta-tester", "premium"),
-                )
-            currentContext = defaultContext
             flagshipClient?.onContextChange(emptyMap(), defaultContext)
         } catch (e: Exception) {
             initError = e.message ?: "Initialization failed"
@@ -147,62 +129,12 @@ fun MainScreen(
 
         Button(
             onClick = {
-                val newContext =
-                    if (contextVariant == "default") {
-                        mapOf(
-                            "user_tier" to "premium",
-                            "country" to "IN",
-                            "user_group" to "regular_users",
-                            "is_logged_in" to false,
-                            "is_accessibility_user" to false,
-                            "device" to "tablet",
-                            "theme_pref" to "dark",
-                            "session_count" to 5.0,
-                            "region" to "EU",
-                            "userId" to 3456,
-                            "app_version" to "1.8.0",
-                        )
-                    } else {
-                        mapOf(
-                            "user_tier" to "premium",
-                            "country" to "US",
-                            "user_group" to "beta_testers",
-                            "is_logged_in" to true,
-                            "is_accessibility_user" to true,
-                            "device" to "mobile",
-                            "theme_pref" to "light",
-                            "session_count" to 150.0,
-                            "region" to "US",
-                            "userId" to 3456,
-                            "app_version" to "2.3.0",
-                        )
-                    }
-
-                val oldContext = currentContext
-                flagshipClient?.onContextChange(oldContext, newContext)
-                currentContext = newContext
-                contextVariant = if (contextVariant == "default") "alternate" else "default"
-                darkModeEnabled = null
-                stringValue = null
-                doubleValue = null
-                objectValue = null
-            },
-            enabled = isInitialized,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                "Update Context (Switch to ${if (contextVariant == "default") "Alternate" else "Default"})",
-            )
-        }
-
-        Button(
-            onClick = {
                 val result =
                     flagshipClient?.getBoolean(
                         key = "dark_mode_toggle",
                         defaultValue = false,
                         targetingKey = "3456",
-                        context = currentContext,
+                        context = defaultContext,
                     )
                 darkModeEnabled = result?.value
             },
@@ -227,7 +159,7 @@ fun MainScreen(
                         key = "homepage_layout_test",
                         defaultValue = "default",
                         targetingKey = "3456",
-                        context = currentContext,
+                        context = defaultContext,
                     )
                 stringValue = result?.value
             },
@@ -252,7 +184,7 @@ fun MainScreen(
                         key = "search_result_limit",
                         defaultValue = 10.0,
                         targetingKey = "3456",
-                        context = currentContext,
+                        context = defaultContext,
                     )
                 doubleValue = result?.value
             },
@@ -281,7 +213,7 @@ fun MainScreen(
                         key = "recommendations_config",
                         defaultValue = defaultObj.toString(),
                         targetingKey = "3456",
-                        context = currentContext,
+                        context = defaultContext,
                     )
                 objectValue = result?.value
             },
@@ -295,6 +227,31 @@ fun MainScreen(
             StatusCard(
                 label = "Recommendations Config:",
                 value = objectValue ?: "",
+                isSuccess = true,
+            )
+        }
+
+        Button(
+            onClick = {
+                val result =
+                    flagshipClient?.getString(
+                        key = "min_supported_app_version",
+                        defaultValue = "1.0.0",
+                        targetingKey = "3456",
+                        context = defaultContext,
+                    )
+                semverValue = result?.value
+            },
+            enabled = isInitialized,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Evaluate Min Supported App Version")
+        }
+
+        if (semverValue != null) {
+            StatusCard(
+                label = "Min Supported App Version:",
+                value = "Value: $semverValue",
                 isSuccess = true,
             )
         }
