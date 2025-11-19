@@ -86,6 +86,8 @@ public final class FeatureAllocationEvaluator {
             return evaluateNotEquals(userValue: userValue, expectedValue: expectedValue, contextFieldName: contextField, contextFields: contextFields)
         case "in":
             return evaluateIn(userValue: userValue, expectedValue: expectedValue, contextFieldName: contextField, contextFields: contextFields)
+        case "ct":
+            return evaluateContains(userValue: userValue, expectedValue: expectedValue, contextFieldName: contextField, contextFields: contextFields)
         case "gt":
             return evaluateGreaterThan(userValue: userValue, expectedValue: expectedValue, contextFieldName: contextField, contextFields: contextFields)
         case "lt":
@@ -167,6 +169,50 @@ public final class FeatureAllocationEvaluator {
                 return false
             } else {
                 return expectedArray.contains(userString)
+            }
+        }
+        
+        return false
+    }
+    
+    private func evaluateContains(userValue: Value, expectedValue: Any, contextFieldName: String, contextFields: [String: [String: Any]]) -> Bool {
+        guard let userArray = userValue.asList() else {
+            return false
+        }
+        
+        if let expectedNumber = expectedValue as? NSNumber, !CFNumberIsFloatType(expectedNumber) {
+            let userIntArray = userArray.compactMap { $0.asInteger() }
+            if userIntArray.count == userArray.count {
+                return userIntArray.contains(expectedNumber.int64Value)
+            }
+            return false
+        }
+        
+        if let expectedInt = expectedValue as? Int {
+            let userIntArray = userArray.compactMap { $0.asInteger() }
+            if userIntArray.count == userArray.count {
+                return userIntArray.contains(Int64(expectedInt))
+            }
+            return false
+        }
+        
+        if let expectedString = expectedValue as? String {
+            let userStringArray = userArray.compactMap { $0.asString() }
+            if userStringArray.count != userArray.count {
+                return false
+            }
+            
+            if isContextFieldSemver(contextFieldName: contextFieldName, contextFields: contextFields) {
+                guard SemverUtility.isSemver(expectedString) else {
+                    return false
+                }
+                let allSemver = userStringArray.allSatisfy { SemverUtility.isSemver($0) }
+                guard allSemver else {
+                    return false
+                }
+                return userStringArray.contains { SemverUtility.compareSemver(userVersion: $0, expectedVersion: expectedString) == 0 }
+            } else {
+                return userStringArray.contains(expectedString)
             }
         }
         

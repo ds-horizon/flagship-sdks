@@ -108,6 +108,7 @@ fun MainScreen(
                     "region" to "US",
                     "userId" to 3456,
                     "app_version" to "2.3.0",
+                    "user_tags" to listOf("early-adopter", "beta-tester", "premium"),
                 )
             currentContext = defaultContext
             flagshipClient?.onContextChange(emptyMap(), defaultContext)

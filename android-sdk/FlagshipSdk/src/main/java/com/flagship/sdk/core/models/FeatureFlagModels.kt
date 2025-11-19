@@ -148,6 +148,9 @@ enum class Operator {
     @SerialName("in")
     In,
 
+    @SerialName("ct")
+    Ct,
+
     @SerialName("lte")
     LTE,
 

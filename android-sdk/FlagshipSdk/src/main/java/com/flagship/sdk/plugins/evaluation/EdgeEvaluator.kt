@@ -1,6 +1,5 @@
 package com.flagship.sdk.plugins.evaluation
 
-import android.util.Log
 import com.flagship.sdk.core.contracts.ICache
 import com.flagship.sdk.core.contracts.IEvaluator
 import com.flagship.sdk.core.models.AllocationElement
@@ -310,6 +309,8 @@ class EdgeEvaluator(
                     ?: false
             }
 
+            Operator.Ct -> contains(left, constraint.value)
+
             Operator.Eq -> eq(left, constraint.value)
 
             Operator.Neq -> !eq(left, constraint.value)
@@ -318,6 +319,37 @@ class EdgeEvaluator(
             Operator.Gte -> compare(left, constraint.value)?.let { it >= 0 } ?: false
             Operator.Lt -> compare(left, constraint.value)?.let { it < 0 } ?: false
             Operator.LTE -> compare(left, constraint.value)?.let { it <= 0 } ?: false
+        }
+    }
+
+    private fun contains(
+        left: Any?,
+        right: ConstraintValue,
+    ): Boolean {
+        val userList = when (left) {
+            is List<*> -> left
+            is Array<*> -> left.toList()
+            else -> return false
+        }
+
+        return when (right) {
+            is ConstraintValue.IntegerValue -> {
+                val userIntList = userList.mapNotNull { (it as? Number)?.toLong() }
+                if (userIntList.size == userList.size) {
+                    userIntList.contains(right.value)
+                } else {
+                    false
+                }
+            }
+            is ConstraintValue.StringValue -> {
+                val userStringList = userList.mapNotNull { it as? String }
+                if (userStringList.size == userList.size) {
+                    userStringList.contains(right.value)
+                } else {
+                    false
+                }
+            }
+            else -> false
         }
     }
 
@@ -341,8 +373,6 @@ class EdgeEvaluator(
             is ConstraintValue.DoubleValue -> left.toDoubleOrNull()?.compareTo(right.value)
             is ConstraintValue.IntegerValue -> left.toLongOrNull()?.compareTo(right.value)
             is ConstraintValue.StringValue -> {
-                // TODO: Implement semver comparison when you support it.
-                // e.g., return semverCompare(left as? String, right.value)
                 null
             }
 

@@ -83,16 +83,23 @@ fun OpenFeatureScreen(
             val defaultContextMap =
                 mapOf(
                     "user_tier" to Value.String("premium"),
-                    "country" to Value.String("US"),
-                    "user_group" to Value.String("beta_testers"),
+                    "country" to Value.String("IN"),
+                    "user_group" to Value.String("beta_testersss"),
                     "is_logged_in" to Value.Boolean(true),
-                    "is_accessibility_user" to Value.Boolean(true),
+                    "is_accessibility_user" to Value.Boolean(false),
                     "device" to Value.String("mobile"),
                     "theme_pref" to Value.String("light"),
                     "session_count" to Value.Double(150.0),
-                    "region" to Value.String("US"),
+                    "region" to Value.String("IN"),
                     "userId" to Value.Integer(3456),
                     "app_version" to Value.String("2.3.0"),
+                    "user_tags" to Value.List(
+                        listOf(
+                            Value.String("early-adopter"),
+                            Value.String("beta-tester"),
+                            Value.String("premium"),
+                        ),
+                    ),
                 )
 
             OpenFeatureAPI.setEvaluationContext(
@@ -152,6 +159,12 @@ fun OpenFeatureScreen(
                             "region" to Value.String("EU"),
                             "userId" to Value.Integer(3456),
                             "app_version" to Value.String("1.8.0"),
+                            "user_tags" to Value.List(
+                                listOf(
+                                    Value.String("regular"),
+                                    Value.String("standard"),
+                                ),
+                            ),
                         )
                     } else {
                         mapOf(
@@ -166,6 +179,13 @@ fun OpenFeatureScreen(
                             "region" to Value.String("US"),
                             "userId" to Value.Integer(3456),
                             "app_version" to Value.String("2.3.0"),
+                            "user_tags" to Value.List(
+                                listOf(
+                                    Value.String("early-adopter"),
+                                    Value.String("beta-tester"),
+                                    Value.String("premium"),
+                                ),
+                            ),
                         )
                     }
 
