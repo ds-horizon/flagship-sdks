@@ -185,8 +185,9 @@ afterEvaluate {
             closeTask.mustRunAfter(publishTask)
         }
     }
-    tasks.named("signBarPublication") {
-        dependsOn("bundleReleaseAar")
+    // Only configure signing task if it exists (only created when signing is configured)
+    tasks.findByName("signBarPublication")?.let {
+        it.dependsOn("bundleReleaseAar")
     }
     tasks.named("bundleReleaseAar") {
         mustRunAfter("clean")
