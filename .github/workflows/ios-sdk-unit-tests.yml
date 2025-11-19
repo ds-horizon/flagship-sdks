@@ -51,11 +51,11 @@ jobs:
           echo "=================================="
           
           # Make sure the script is executable
-          chmod +x run_tests.sh
+          chmod +x run_all_ios_test.sh
           
           # Run all tests using your improved script
           echo "📱 Running All Tests..."
-          ./run_tests.sh
+          ./run_all_ios_test.sh
           
           echo "=================================="
           echo "✅ All tests completed!"
@@ -65,15 +65,6 @@ jobs:
         if: always()
         run: |
           echo "## 🎯 iOS SDK Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ Test Suites Executed:" >> $GITHUB_STEP_SUMMARY
-          echo "- String Feature Flag Evaluation" >> $GITHUB_STEP_SUMMARY
-          echo "- Boolean Feature Flag Evaluation" >> $GITHUB_STEP_SUMMARY
-          echo "- Semver Feature Flag Evaluation" >> $GITHUB_STEP_SUMMARY
-          echo "- Double Feature Flag Evaluation" >> $GITHUB_STEP_SUMMARY
-          echo "- Object Feature Flag Evaluation" >> $GITHUB_STEP_SUMMARY
-          echo "- Hash Utility Tests" >> $GITHUB_STEP_SUMMARY
-          echo "- Comprehensive Test Suite" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔨 Build Status:" >> $GITHUB_STEP_SUMMARY
           echo "- iOS SDK Framework: ✅ Built Successfully" >> $GITHUB_STEP_SUMMARY
