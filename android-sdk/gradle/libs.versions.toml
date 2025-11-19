@@ -15,6 +15,7 @@ okhttp = "4.12.0"
 kotlinxSerialization = "1.6.3"
 room = "2.8.1"
 openfeature = "0.6.2"
+semver = "0.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 open-feature-ktx = { group = "dev.openfeature", name = "kotlin-sdk", version.ref = "openfeature" }
+java-semver = { group = "com.github.zafarkhaja", name = "java-semver", version.ref = "semver" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
