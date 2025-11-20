@@ -1,22 +1,12 @@
 name: iOS SDK Tests
 
-
-
 on:
   push:
     paths:
       - 'ios-sdk/**'
-    branches:
-      - main
-      - develop
-      - 'feature/*'
-      - 'hotfix/*'
   pull_request:
     paths:
       - 'ios-sdk/**'
-    branches:
-      - main
-      - develop
 
 jobs:
   test:
