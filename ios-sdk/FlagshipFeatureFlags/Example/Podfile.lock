@@ -1,23 +1,51 @@
 PODS:
-  - FlagshipFeatureFlags (0.2.92):
+  - CwlCatchException (2.2.1):
+    - CwlCatchExceptionSupport (~> 2.2.1)
+  - CwlCatchExceptionSupport (2.2.1)
+  - CwlMachBadInstructionHandler (2.2.2)
+  - CwlPosixPreconditionTesting (2.2.2)
+  - CwlPreconditionTesting (2.2.2):
+    - CwlCatchException (~> 2.2.1)
+    - CwlMachBadInstructionHandler (~> 2.2.2)
+    - CwlPosixPreconditionTesting (~> 2.2.2)
+  - FlagshipFeatureFlags (0.2.94):
     - OpenFeature (= 0.3.0)
+  - Nimble (13.8.0):
+    - CwlPreconditionTesting (~> 2.2.0)
   - OpenFeature (0.3.0)
+  - Quick (7.6.2)
 
 DEPENDENCIES:
   - FlagshipFeatureFlags (from `../`)
+  - Nimble
+  - Quick
 
 SPEC REPOS:
   trunk:
+    - CwlCatchException
+    - CwlCatchExceptionSupport
+    - CwlMachBadInstructionHandler
+    - CwlPosixPreconditionTesting
+    - CwlPreconditionTesting
+    - Nimble
     - OpenFeature
+    - Quick
 
 EXTERNAL SOURCES:
   FlagshipFeatureFlags:
     :path: "../"
 
 SPEC CHECKSUMS:
-  FlagshipFeatureFlags: 8d6e513943151992c7e9a881d364dd91b266b984
+  CwlCatchException: 7acc161b299a6de7f0a46a6ed741eae2c8b4d75a
+  CwlCatchExceptionSupport: 54ccab8d8c78907b57f99717fb19d4cc3bce02dc
+  CwlMachBadInstructionHandler: dae4fdd124d45c9910ac240287cc7b898f4502a1
+  CwlPosixPreconditionTesting: ecd095aa2129e740b44301c34571e8d85906fb88
+  CwlPreconditionTesting: 67a0047dd4de4382b93442c0e3f25207f984f35a
+  FlagshipFeatureFlags: f15b631127a2ba0f8c06a33359c491fd899b6d18
+  Nimble: 84982ec98b5dfc0ffe9ae2ed4c0b2fc57807c2d5
   OpenFeature: 985529d7d21078c4166233b254446728af642c49
+  Quick: b8bec97cd4b9f21da0472d45580f763b801fc353
 
-PODFILE CHECKSUM: 1d41a8690f2e71b11ffe81f0cfd4114509a831a0
+PODFILE CHECKSUM: 5a0bb2205aac4db620b6b9d7eb46ccbabd9ee015
 
 COCOAPODS: 1.16.2
