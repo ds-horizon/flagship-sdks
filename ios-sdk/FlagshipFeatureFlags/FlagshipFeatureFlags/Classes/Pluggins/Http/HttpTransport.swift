@@ -24,7 +24,7 @@ public final class HttpTransport: Transport {
             requestURL = "\(configURL)\(querySeparator)type=\(configType)"
         }
         
-        let requestHeaders = ["tenant-id": config.tenantId]
+        let requestHeaders = ["flagship-api-key": config.flagshipApiKey]
         let httpResponse = try await HttpUtility.shared.get(
             url: requestURL,
             headers: requestHeaders,

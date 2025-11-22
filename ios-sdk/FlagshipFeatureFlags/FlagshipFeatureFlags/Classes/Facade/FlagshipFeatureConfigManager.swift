@@ -41,11 +41,11 @@ public final class FlagshipFeatureConfigManager {
 public struct FlagshipFeatureConfig {
     public let baseURL: String
     public let refreshInterval: TimeInterval
-    public let tenantId: String
+    public let flagshipApiKey: String
     
-    public init(baseURL: String, refreshInterval: TimeInterval = 30, tenantId: String) {
+    public init(baseURL: String, refreshInterval: TimeInterval = 30, flagshipApiKey: String) {
         self.baseURL = baseURL
         self.refreshInterval = refreshInterval
-        self.tenantId = tenantId
+        self.flagshipApiKey = flagshipApiKey
     }
 }

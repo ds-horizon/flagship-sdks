@@ -41,7 +41,7 @@ class Registry(
         transport =
             FlagshipHttpTransport.createForTesting(
                 baseUrl = config.baseUrl,
-                tenantId = config.tenantId,
+                flagshipApiKey = config.flagshipApiKey,
                 enableLogging = false,
                 mockInterceptors = emptyList(),
             )

@@ -18,7 +18,7 @@ object MockInterceptorExamples {
                 FlagshipHttpTransport.createForTesting(
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
-                    tenantId = "",
+                    flagshipApiKey = "",
                     baseUrl = "https://google.com",
                 )
 
@@ -49,7 +49,7 @@ object MockInterceptorExamples {
                 FlagshipHttpTransport.createForTesting(
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
-                    tenantId = "",
+                    flagshipApiKey = "",
                     baseUrl = "https://google.com",
                 )
 
@@ -73,7 +73,7 @@ object MockInterceptorExamples {
                 FlagshipHttpTransport.createForTesting(
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
-                    tenantId = "",
+                    flagshipApiKey = "",
                     baseUrl = "https://google.com",
                 )
 
@@ -121,7 +121,7 @@ object MockInterceptorExamples {
                 FlagshipHttpTransport.createForTesting(
                     mockInterceptors = listOf(mockInterceptor),
                     enableLogging = true,
-                    tenantId = "",
+                    flagshipApiKey = "",
                     baseUrl = "https://google.com",
                 )
 
@@ -167,7 +167,7 @@ object MockInterceptorExamples {
                     FlagshipHttpTransport.createForTesting(
                         mockInterceptors = listOf(mockInterceptor),
                         enableLogging = true,
-                        tenantId = "",
+                        flagshipApiKey = "",
                         baseUrl = "https://google.com",
                     )
 

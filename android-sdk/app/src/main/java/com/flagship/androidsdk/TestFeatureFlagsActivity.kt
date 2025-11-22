@@ -55,8 +55,8 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
             val config =
                 FlagShipConfig(
                     applicationContext = application,
-                    baseUrl = "http://10.0.2.2:8080", // Android emulator localhost
-                    tenantId = "tenant1", // Default tenant, can be changed
+                    baseUrl = "http://10.0.2.2:8080",
+                    flagshipApiKey = "tenant1",
                     refreshInterval =
                         java.util.concurrent.TimeUnit.SECONDS
                             .toMillis(30),

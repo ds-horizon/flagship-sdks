@@ -35,16 +35,13 @@ class ViewController: UIViewController {
         let config = FlagshipFeatureConfig(
             baseURL: "http://localhost:8080",
             refreshInterval: 10,
-            tenantId: "tenant1"
+            flagshipApiKey: "tenant1"
         )
         
-        // Create our custom provider with config only
         let provider = FlagshipOpenFeatureProvider(config: config)
-        
-        // Set the provider in OpenFeature
         OpenFeatureAPI.shared.setProvider(provider: provider)
 
-        print("🚀 OpenFeature configured with FlagshipFeatureProvider (tenantId: \(config.tenantId))")
+        print("🚀 OpenFeature configured with FlagshipFeatureProvider (flagshipApiKey: \(config.flagshipApiKey))")
         
         // Set up evaluation context for personalized layout
         let context = MutableContext(targetingKey: "3456", structure: MutableStructure(attributes: [
