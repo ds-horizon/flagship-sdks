@@ -9,7 +9,7 @@ import dev.openfeature.kotlin.sdk.OpenFeatureAPI
 
 data class FlagshipRnSdkConfig(
   val baseUrl: String,
-  val tenantId: String,
+  val flagshipApiKey: String,
   val refreshInterval: Long,
 )
 
@@ -23,7 +23,7 @@ object FlagshipConfigManager {
     configMap: ReadableMap,
   ) {
     val baseUrl = configMap.getString("baseUrl") ?: ""
-    val tenantId = configMap.getString("tenantId") ?: ""
+    val flagshipApiKey = configMap.getString("flagshipApiKey") ?: ""
     val refreshIntervalSeconds = if (configMap.hasKey("refreshInterval")) {
       configMap.getDouble("refreshInterval").toLong()
     } else {
@@ -33,7 +33,7 @@ object FlagshipConfigManager {
 
     config = FlagshipRnSdkConfig(
       baseUrl = baseUrl,
-      tenantId = tenantId,
+      flagshipApiKey = flagshipApiKey,
       refreshInterval = refreshIntervalMs,
     )
 
@@ -43,14 +43,14 @@ object FlagshipConfigManager {
     val flagShipConfig = FlagShipConfig(
       applicationContext = application,
       baseUrl = baseUrl,
-      tenantId = tenantId,
+      flagshipApiKey = flagshipApiKey,
       refreshInterval = refreshIntervalMs,
     )
 
     val provider = FlagshipProvider("ABcd", flagShipConfig)
     OpenFeatureAPI.setProvider(provider)
 
-    println("FlagshipRnSdk: initialize called with baseUrl=$baseUrl, tenantId=$tenantId, refreshInterval=${refreshIntervalSeconds}s (${refreshIntervalMs}ms)")
+    println("FlagshipRnSdk: initialize called with baseUrl=$baseUrl, flagshipApiKey=$flagshipApiKey, refreshInterval=${refreshIntervalSeconds}s (${refreshIntervalMs}ms)")
   }
 }
 

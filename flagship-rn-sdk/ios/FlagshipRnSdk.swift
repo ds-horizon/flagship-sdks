@@ -24,8 +24,8 @@ class FlagshipRnSdkImpl: NSObject {
         return
       }
       
-      guard let tenantId = config["tenantId"] as? String, !tenantId.isEmpty else {
-        reject("CONFIG_ERROR", "tenantId is required and must not be empty", nil)
+      guard let flagshipApiKey = config["flagshipApiKey"] as? String, !flagshipApiKey.isEmpty else {
+        reject("CONFIG_ERROR", "flagshipApiKey is required and must not be empty", nil)
         return
       }
       
@@ -35,7 +35,7 @@ class FlagshipRnSdkImpl: NSObject {
         let flagshipConfig = FlagshipFeatureConfig(
           baseURL: baseUrl,
           refreshInterval: refreshInterval,
-          tenantId: tenantId
+          flagshipApiKey: flagshipApiKey
         )
         
         let provider = FlagshipOpenFeatureProvider(config: flagshipConfig)

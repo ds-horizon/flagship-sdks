@@ -1,6 +1,6 @@
 export interface InitializeConfig {
   baseUrl: string;
-  tenantId: string;
+  flagshipApiKey: string;
   refreshInterval: number;
 }
 

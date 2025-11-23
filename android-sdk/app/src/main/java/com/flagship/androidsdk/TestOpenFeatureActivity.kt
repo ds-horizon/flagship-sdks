@@ -73,7 +73,7 @@ fun OpenFeatureScreen(
                 FlagShipConfig(
                     applicationContext = applicationContext,
                     baseUrl = "http://10.0.2.2:8080",
-                    tenantId = "tenant1",
+                    flagshipApiKey = "tenant1",
                     refreshInterval = TimeUnit.SECONDS.toMillis(30),
                 )
 

@@ -39,34 +39,7 @@ cd ios && pod install && cd ..
 
 #### Android
 
-The SDK requires GitHub credentials to access the Android SDK dependency from GitHub Packages. You need to set these credentials before building your Android app.
-
-**Option 1: Using Environment Variables (Recommended)**
-
-Set the following environment variables in your system:
-
-```sh
-export GITHUB_USERNAME=your-github-username
-export GITHUB_TOKEN=your-github-pat-token
-```
-
-**Option 2: Using Gradle Properties**
-
-Add the credentials to your `android/gradle.properties` file (or `~/.gradle/gradle.properties` for global configuration):
-
-```properties
-GITHUB_USERNAME=your-github-username
-GITHUB_TOKEN=your-github-pat-token
-```
-
-**When are credentials needed?**
-
-- During `gradle build` or `./gradlew build`
-- When running `npm run android` or `yarn android`
-- When Android Studio syncs the project
-- During CI/CD builds
-
-**Note:** The credentials are only used to download the Android SDK dependency from GitHub Packages. They are not included in your app bundle.
+No additional setup required for Android.
 
 ## Usage
 
@@ -79,7 +52,7 @@ import { initialize } from '@d11/flagship-rn-sdk';
 
 await initialize({
   baseUrl: 'https://api.example.com',
-  tenantId: 'your-tenant-id',
+  flagshipApiKey: 'your-api-key',
   refreshInterval: 60, // in seconds (default: 30)
 });
 ```
@@ -87,7 +60,7 @@ await initialize({
 **Configuration Options:**
 
 - `baseUrl` (string, required): Base URL of your feature flag service
-- `tenantId` (string, required): Your tenant identifier
+- `flagshipApiKey` (string, required): Your Flagship API key
 - `refreshInterval` (number, optional): Polling interval in seconds (default: 30)
 
 ### 2. Set User Context
@@ -97,7 +70,7 @@ Set the user context to enable context-based flag targeting:
 ```typescript
 import { setContext } from '@d11/flagship-rn-sdk';
 
-await setContext({
+setContext({
   targetingKey: 'user-123',
   user_tier: 'premium',
   country: 'US',
@@ -124,7 +97,7 @@ Evaluate feature flags with type-safe methods:
 ```typescript
 import { getBooleanValue } from '@d11/flagship-rn-sdk';
 
-const darkModeEnabled = await getBooleanValue('dark_mode', false);
+const darkModeEnabled = getBooleanValue('dark_mode', false);
 if (darkModeEnabled) {
   // Enable dark mode
 }
@@ -135,7 +108,7 @@ if (darkModeEnabled) {
 ```typescript
 import { getStringValue } from '@d11/flagship-rn-sdk';
 
-const theme = await getStringValue('app_theme', 'light');
+const theme = getStringValue('app_theme', 'light');
 ```
 
 #### Integer Flags
@@ -143,7 +116,7 @@ const theme = await getStringValue('app_theme', 'light');
 ```typescript
 import { getIntegerValue } from '@d11/flagship-rn-sdk';
 
-const maxItems = await getIntegerValue('max_cart_items', 10);
+const maxItems = getIntegerValue('max_cart_items', 10);
 ```
 
 #### Double Flags
@@ -151,7 +124,7 @@ const maxItems = await getIntegerValue('max_cart_items', 10);
 ```typescript
 import { getDoubleValue } from '@d11/flagship-rn-sdk';
 
-const discountRate = await getDoubleValue('discount_rate', 0.0);
+const discountRate = getDoubleValue('discount_rate', 0.0);
 ```
 
 #### Object Flags
@@ -159,7 +132,7 @@ const discountRate = await getDoubleValue('discount_rate', 0.0);
 ```typescript
 import { getObjectValue } from '@d11/flagship-rn-sdk';
 
-const config = await getObjectValue('app_config', {});
+const config = getObjectValue('app_config', {});
 ```
 
 ### Complete Example
@@ -184,20 +157,20 @@ export default function App() {
       // Initialize SDK
       await initialize({
         baseUrl: 'https://api.example.com',
-        tenantId: 'your-tenant-id',
+        flagshipApiKey: 'your-api-key',
         refreshInterval: 60,
       });
 
       // Set user context
-      await setContext({
+      setContext({
         targetingKey: 'user-123',
         user_tier: 'premium',
         country: 'US',
       });
 
       // Evaluate flags
-      const darkModeFlag = await getBooleanValue('dark_mode', false);
-      const themeFlag = await getStringValue('app_theme', 'light');
+      const darkModeFlag = getBooleanValue('dark_mode', false);
+      const themeFlag = getStringValue('app_theme', 'light');
 
       setDarkMode(darkModeFlag);
       setTheme(themeFlag);
@@ -227,12 +200,12 @@ Initializes the SDK with the provided configuration.
 
 **Parameters:**
 - `config.baseUrl` (string): Base URL for the feature flag service
-- `config.tenantId` (string): Tenant identifier
+- `config.flagshipApiKey` (string): Flagship API key
 - `config.refreshInterval` (number, optional): Polling interval in seconds (default: 30)
 
 **Returns:** `Promise<boolean>` - `true` if initialization succeeds
 
-### `setContext(context: SetContextConfig): Promise<boolean>`
+### `setContext(context: SetContextConfig): boolean`
 
 Sets the user context for flag evaluation.
 
@@ -240,7 +213,7 @@ Sets the user context for flag evaluation.
 - `context.targetingKey` (string, required): Unique user identifier
 - `context[key: string]` (ContextValue): Additional context fields
 
-**Returns:** `Promise<boolean>` - `true` if context is set successfully
+**Returns:** `boolean` - `true` if context is set successfully
 
 **Context Value Types:**
 - `string`
@@ -250,7 +223,7 @@ Sets the user context for flag evaluation.
 - `ContextValue[]` (array)
 - `{ [key: string]: ContextValue }` (object)
 
-### `getBooleanValue(key: string, defaultValue: boolean): Promise<boolean>`
+### `getBooleanValue(key: string, defaultValue: boolean): boolean`
 
 Gets a boolean flag value.
 
@@ -258,9 +231,9 @@ Gets a boolean flag value.
 - `key` (string): Flag key
 - `defaultValue` (boolean): Default value if flag is not found
 
-**Returns:** `Promise<boolean>` - Flag value or default
+**Returns:** `boolean` - Flag value or default
 
-### `getStringValue(key: string, defaultValue: string): Promise<string>`
+### `getStringValue(key: string, defaultValue: string): string`
 
 Gets a string flag value.
 
@@ -268,9 +241,9 @@ Gets a string flag value.
 - `key` (string): Flag key
 - `defaultValue` (string): Default value if flag is not found
 
-**Returns:** `Promise<string>` - Flag value or default
+**Returns:** `string` - Flag value or default
 
-### `getIntegerValue(key: string, defaultValue: number): Promise<number>`
+### `getIntegerValue(key: string, defaultValue: number): number`
 
 Gets an integer flag value.
 
@@ -278,9 +251,9 @@ Gets an integer flag value.
 - `key` (string): Flag key
 - `defaultValue` (number): Default value if flag is not found
 
-**Returns:** `Promise<number>` - Flag value or default
+**Returns:** `number` - Flag value or default
 
-### `getDoubleValue(key: string, defaultValue: number): Promise<number>`
+### `getDoubleValue(key: string, defaultValue: number): number`
 
 Gets a double/float flag value.
 
@@ -288,9 +261,9 @@ Gets a double/float flag value.
 - `key` (string): Flag key
 - `defaultValue` (number): Default value if flag is not found
 
-**Returns:** `Promise<number>` - Flag value or default
+**Returns:** `number` - Flag value or default
 
-### `getObjectValue(key: string, defaultValue: Object): Promise<Object>`
+### `getObjectValue(key: string, defaultValue: Object): Object`
 
 Gets an object flag value.
 
@@ -298,7 +271,7 @@ Gets an object flag value.
 - `key` (string): Flag key
 - `defaultValue` (Object): Default value if flag is not found
 
-**Returns:** `Promise<Object>` - Flag value or default
+**Returns:** `Object` - Flag value or default
 
 ## TypeScript Support
 
@@ -323,7 +296,7 @@ If you encounter build issues on iOS:
 If flags always return default values:
 
 1. Verify `baseUrl` is correct and accessible
-2. Check `tenantId` matches your configuration
+2. Check `flagshipApiKey` matches your configuration
 3. Ensure `setContext` is called with valid `targetingKey`
 5. Check network connectivity
 

@@ -19,7 +19,7 @@ export default function App() {
       const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
       await initialize({
         baseUrl,
-        tenantId: 'tenant1',
+        flagshipApiKey: 'tenant1',
         refreshInterval: 10,
       });
       setIsInitialized(true);

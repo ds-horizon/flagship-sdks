@@ -89,11 +89,11 @@ class FlagshipHttpTransport private constructor(
 
         fun createForTesting(
             baseUrl: String = "https://test.example.com",
-            tenantId: String,
+            flagshipApiKey: String,
             mockInterceptors: List<Interceptor> = emptyList(),
             enableLogging: Boolean = false,
         ): FlagshipHttpTransport {
-            val authConfig = tenantId.let { AuthConfig.ApiKey(headerName = "tenant-id", headerValue = it) }
+            val authConfig = flagshipApiKey.let { AuthConfig.ApiKey(headerName = "flagship-api-key", headerValue = it) }
 
             val config =
                 HttpClientConfig.testing(
@@ -110,9 +110,9 @@ class FlagshipHttpTransport private constructor(
 
         fun createProduction(
             baseUrl: String,
-            tenantId: String,
+            flagshipApiKey: String,
         ): FlagshipHttpTransport {
-            val authConfig = tenantId.let { AuthConfig.ApiKey(it, headerValue = "tenant-id") }
+            val authConfig = flagshipApiKey.let { AuthConfig.ApiKey(headerName = "flagship-api-key", headerValue = it) }
 
             val config =
                 HttpClientConfig.production(
