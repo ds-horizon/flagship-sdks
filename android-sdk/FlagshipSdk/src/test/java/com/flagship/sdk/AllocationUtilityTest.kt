@@ -2,10 +2,11 @@ package com.flagship.sdk
 
 import com.flagship.sdk.plugins.evaluation.AllocationBucket
 import com.flagship.sdk.plugins.evaluation.AllocationUtility
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
 
 class AllocationUtilityTest {
     @Test
@@ -25,7 +26,7 @@ class AllocationUtilityTest {
         // Verify the same result is returned across multiple calls
         for (i in 1..100) {
             val iterationResult = AllocationUtility.getAllocationResult(flagKey, targetKey, buckets)
-            assertEquals("Result should be consistent across calls", result.key, iterationResult.key)
+            assertEquals(result.key, iterationResult.key, "Result should be consistent across calls")
         }
     }
 
@@ -42,7 +43,7 @@ class AllocationUtilityTest {
 
         // Result should be one of the provided buckets
         val bucketKeys = buckets.map { it.key }
-        assertTrue("Result should be one of the provided buckets", bucketKeys.contains(result.key))
+        assertTrue(bucketKeys.contains(result.key), "Result should be one of the provided buckets")
     }
 
     @Test
@@ -69,12 +70,12 @@ class AllocationUtilityTest {
         val bPercentage = (bCount.toDouble() / numUsers) * 100
 
         assertTrue(
-            "A bucket should get ~50% (got $aPercentage%)",
             aPercentage >= 45.0 && aPercentage <= 55.0,
+            "A bucket should get ~50% (got $aPercentage%)",
         )
         assertTrue(
-            "B bucket should get ~50% (got $bPercentage%)",
             bPercentage >= 45.0 && bPercentage <= 55.0,
+            "B bucket should get ~50% (got $bPercentage%)",
         )
     }
 
@@ -95,8 +96,8 @@ class AllocationUtilityTest {
         val flag2Result1 = AllocationUtility.getAllocationResult("flag2", user, buckets)
         val flag2Result2 = AllocationUtility.getAllocationResult("flag2", user, buckets)
 
-        assertEquals("Same flag should give same result", flag1Result1.key, flag1Result2.key)
-        assertEquals("Same flag should give same result", flag2Result1.key, flag2Result2.key)
+        assertEquals(flag1Result1.key, flag1Result2.key, "Same flag should give same result")
+        assertEquals(flag2Result1.key, flag2Result2.key, "Same flag should give same result")
 
         // Different flags may give different results (not guaranteed, but possible)
         // This test just ensures the algorithm works independently per flag
@@ -108,7 +109,7 @@ class AllocationUtilityTest {
 
         val result = AllocationUtility.getAllocationResult("test-flag", "user123", buckets)
 
-        assertEquals("Should return the only bucket", "only_option", result.key)
+        assertEquals("only_option", result.key, "Should return the only bucket")
     }
 
     @Test
@@ -134,25 +135,27 @@ class AllocationUtilityTest {
 
         // Allow 2% tolerance for uneven distributions
         assertTrue(
-            "Rare bucket should get ~5% (got $rarePercentage%)",
             rarePercentage >= 3.0 && rarePercentage <= 7.0,
+            "Rare bucket should get ~5% (got $rarePercentage%)",
         )
         assertTrue(
-            "Common bucket should get ~90% (got $commonPercentage%)",
             commonPercentage >= 88.0 && commonPercentage <= 92.0,
+            "Common bucket should get ~90% (got $commonPercentage%)",
         )
         assertTrue(
-            "Uncommon bucket should get ~5% (got $uncommonPercentage%)",
             uncommonPercentage >= 3.0 && uncommonPercentage <= 7.0,
+            "Uncommon bucket should get ~5% (got $uncommonPercentage%)",
         )
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun getAllocationResult_shouldThrowWhenBucketsEmpty() {
-        AllocationUtility.getAllocationResult("test-flag", "user123", emptyList())
+        assertThrows(IllegalArgumentException::class.java) {
+            AllocationUtility.getAllocationResult("test-flag", "user123", emptyList())
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun getAllocationResult_shouldThrowWhenPercentagesNotSum100_Under() {
         val buckets =
             listOf(
@@ -160,10 +163,12 @@ class AllocationUtilityTest {
                 AllocationBucket("B", 40), // Total = 70, not 100
             )
 
-        AllocationUtility.getAllocationResult("test-flag", "user123", buckets)
+        assertThrows(IllegalArgumentException::class.java) {
+            AllocationUtility.getAllocationResult("test-flag", "user123", buckets)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun getAllocationResult_shouldThrowWhenPercentagesNotSum100_Over() {
         val buckets =
             listOf(
@@ -171,7 +176,9 @@ class AllocationUtilityTest {
                 AllocationBucket("B", 50), // Total = 110, not 100
             )
 
-        AllocationUtility.getAllocationResult("test-flag", "user123", buckets)
+        assertThrows(IllegalArgumentException::class.java) {
+            AllocationUtility.getAllocationResult("test-flag", "user123", buckets)
+        }
     }
 
     @Test
@@ -186,7 +193,7 @@ class AllocationUtilityTest {
         val result1 = AllocationUtility.getAllocationResult("feature-flag_test", "user@example.com", buckets)
         val result2 = AllocationUtility.getAllocationResult("feature-flag_test", "user@example.com", buckets)
 
-        assertEquals("Should handle special characters consistently", result1.key, result2.key)
+        assertEquals(result1.key, result2.key, "Should handle special characters consistently")
     }
 
     @Test
@@ -201,15 +208,15 @@ class AllocationUtilityTest {
         val result2 = AllocationUtility.getAllocationResult("flag", "", buckets)
         val result3 = AllocationUtility.getAllocationResult("", "", buckets)
 
-        assertNotNull("Should handle empty flag key", result1)
-        assertNotNull("Should handle empty targeting key", result2)
-        assertNotNull("Should handle both empty", result3)
+        assertNotNull(result1)
+        assertNotNull(result2)
+        assertNotNull(result3)
 
         // Should be consistent
         assertEquals(
-            "Empty flag key should be consistent",
             result1.key,
             AllocationUtility.getAllocationResult("", "user123", buckets).key,
+            "Empty flag key should be consistent",
         )
     }
 
@@ -242,9 +249,9 @@ class AllocationUtilityTest {
         testCases.forEach { (flag, user) ->
             val result = AllocationUtility.getAllocationResult(flag, user, buckets)
             assertEquals(
-                "Result should be deterministic for $flag:$user",
                 storedResults[Pair(flag, user)],
                 result.key,
+                "Result should be deterministic for $flag:$user",
             )
         }
     }
@@ -258,7 +265,7 @@ class AllocationUtilityTest {
 
         for (i in 1..100) {
             val hash2 = AllocationUtility.generateHash(flagKey, targetingKey)
-            assertEquals("Hash should be the same for the same attributes", hash1, hash2)
+            assertEquals(hash1, hash2, "Hash should be the same for the same attributes")
         }
     }
 }

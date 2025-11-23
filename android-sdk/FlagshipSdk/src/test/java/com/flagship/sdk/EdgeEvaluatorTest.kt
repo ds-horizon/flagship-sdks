@@ -23,17 +23,17 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.serialization.json.jsonObject
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class EdgeEvaluatorTest {
     private lateinit var evaluateCache: ICache
     private lateinit var persistentCache: ICache
     private lateinit var edgeEvaluator: EdgeEvaluator
 
-    @Before
+    @BeforeEach
     fun setUp() {
         evaluateCache = mockk()
         persistentCache = mockk()
@@ -669,152 +669,189 @@ class EdgeEvaluatorTest {
         assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
     }
 
-    @Test
-    fun `evaluateInt returns variant value when semver value matches`() {
-        semverTestData().forEach { (operator, constraintValue, shouldMatch) ->
-            // Given
-            val flagKey = "test_flag"
-            val defaultValue = 10
-            val targetingKey = "user123"
-            val context = EvaluationContext(targetingKey, mapOf("app_version" to "1.2.3"))
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.MethodSource("semverTestDataProvider")
+    fun `evaluateInt returns variant value when semver value matches parameterized`(
+        operator: Operator,
+        constraintValue: String,
+        shouldMatch: Boolean
+    ) {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = 10
+        val targetingKey = "user123"
+        val context = EvaluationContext(targetingKey, mapOf("app_version" to "1.2.3"))
 
-            val variant = VariantElement("variant_a", VariantValue.IntegerValue(69))
-            val defaultVariant = VariantElement("variant_default", VariantValue.IntegerValue(42))
-            val allocation = AllocationElement(100, "variant_a")
-            val constraint = Constraint("app_version", operator, ConstraintValue.StringValue(constraintValue))
-            val rule = Rule(listOf(allocation), listOf(constraint), "1")
-            val config =
-                createTestFeature(
-                    rolloutPercentage = 100,
-                    rules = listOf(rule),
-                    variants = listOf(variant, defaultVariant),
-                    defaultAllocation = listOf(AllocationElement(100, "variant_default")),
-                )
+        val variant = VariantElement("variant_a", VariantValue.IntegerValue(69))
+        val defaultVariant = VariantElement("variant_default", VariantValue.IntegerValue(42))
+        val allocation = AllocationElement(100, "variant_a")
+        val constraint = Constraint("app_version", operator, ConstraintValue.StringValue(constraintValue))
+        val rule = Rule(listOf(allocation), listOf(constraint), "1")
+        val config = createTestFeature(
+            rolloutPercentage = 100,
+            rules = listOf(rule),
+            variants = listOf(variant, defaultVariant),
+            defaultAllocation = listOf(AllocationElement(100, "variant_default")),
+        )
 
-            every { evaluateCache.get<Int>(flagKey) } returns null
+        every { evaluateCache.get<Int>(flagKey) } returns null
 
-            // When
-            val result = edgeEvaluator.evaluateInt(flagKey, defaultValue, config, context)
+        // When
+        val result = edgeEvaluator.evaluateInt(flagKey, defaultValue, config, context)
 
-            // Then
-            if (shouldMatch) {
-                assertEquals(69, result.value)
-                assertEquals("variant_a", result.variant)
-                assertEquals(Reason.TARGETING_MATCH, result.reason)
-            } else {
-                assertEquals(42, result.value)
-                assertEquals("variant_default", result.variant)
-                assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
-            }
+        // Then
+        if (shouldMatch) {
+            assertEquals(69, result.value)
+            assertEquals("variant_a", result.variant)
+            assertEquals(Reason.TARGETING_MATCH, result.reason)
+        } else {
+            assertEquals(42, result.value)
+            assertEquals("variant_default", result.variant)
+            assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
         }
     }
 
-    private fun semverTestData(): List<Triple<Operator, String, Boolean>> {
-        return listOf(
-            // Basic semver comparisons
-            Triple(Operator.Gt, "1.2.2", true),
-            Triple(Operator.Gt, "1.2.3.1", false),
-            Triple(Operator.Eq, "1.2.3", true),
-            Triple(Operator.Eq, "1.2.3.1", false),
-            Triple(Operator.Gte, "1.2.3", true),
-            Triple(Operator.Gte, "100.10001.100000", false),
-            Triple(Operator.LTE, "1.2.3", true),
-            Triple(Operator.LTE, "100.10001.100000", true),
-            Triple(Operator.Lt, "1.2.4", true),
-            Triple(Operator.Neq, "1.2.3", false),
-            Triple(Operator.Neq, "1.2.3.1", true),
-            Triple(Operator.Gt, "1.2.3-alpha", true),  // 1.2.3 > 1.2.3-alpha
-            Triple(Operator.Gt, "1.2.3-beta.1", true),  // 1.2.3 > 1.2.3-beta.1
-            Triple(Operator.Gt, "1.2.3-rc.2", true),  // 1.2.3 > 1.2.3-rc.2
-            Triple(Operator.Gt, "1.2.3-0.3.7", true),  // 1.2.3 > 1.2.3-0.3.7
-            Triple(Operator.Gt, "1.2.3-alpha.1.beta.2", true),  // 1.2.3 > 1.2.3-alpha.1.beta.2
-            Triple(Operator.Gte, "1.2.3-alpha", true),  // 1.2.3 >= 1.2.3-alpha
-            Triple(Operator.Lt, "1.2.3-alpha", false),  // 1.2.3 < 1.2.3-alpha is false
-            Triple(Operator.Neq, "1.2.3-alpha", true),  // 1.2.3 != 1.2.3-alpha
-            Triple(Operator.Gt, "1.2.3-alpha+build.123", true),  // 1.2.3 > 1.2.3-alpha+build.123
-            Triple(Operator.Gt, "1.2.4-alpha+build.123", false),
-            Triple(Operator.Gt, "1.2.3-beta.1+exp.sha.5114f85", true),  // 1.2.3 > 1.2.3-beta.1+exp.sha.5114f85
-            Triple(Operator.Neq, "1.2.3-alpha+build.123", true),  // 1.2.3 != 1.2.3-alpha+build.123
-            Triple(Operator.Gt, "2.0.0-alpha.1", false),  // 1.2.3 > 2.0.0-alpha.1 is false
-            Triple(Operator.Gt, "1.2.4-beta.2", false),  // 1.2.3 > 1.2.4-beta.2 is false
-            Triple(Operator.Lt, "2.0.0-alpha.1", true),  // 1.2.3 < 2.0.0-alpha.1
-            Triple(Operator.Lt, "1.2.4-beta.2", true),  // 1.2.3 < 1.2.4-beta.2
-            Triple(Operator.LTE, "2.0.0-alpha.1", true),  // 1.2.3 <= 2.0.0-alpha.1
-            Triple(Operator.LTE, "1.2.4-beta.2", true),  // 1.2.3 <= 1.2.4-beta.2
+    companion object {
+        @JvmStatic
+        fun semverTestDataProvider(): List<org.junit.jupiter.params.provider.Arguments> {
+            return listOf(
+                // Basic semver comparisons
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.2", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3.1", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3.1", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gte, "1.2.3", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gte, "100.10001.100000", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.LTE, "1.2.3", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.LTE, "100.10001.100000", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Lt, "1.2.4", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3.1", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-alpha", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-beta.1", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-rc.2", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-0.3.7", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-alpha.1.beta.2", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gte, "1.2.3-alpha", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Lt, "1.2.3-alpha", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3-alpha", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-alpha+build.123", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.4-alpha+build.123", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-beta.1+exp.sha.5114f85", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3-alpha+build.123", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "2.0.0-alpha.1", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.4-beta.2", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Lt, "2.0.0-alpha.1", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Lt, "1.2.4-beta.2", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.LTE, "2.0.0-alpha.1", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.LTE, "1.2.4-beta.2", true),
 
-            // Eq and Neq tests for semver (release != pre-release, but build metadata doesn't affect equality)
-            Triple(Operator.Eq, "1.2.3", true),  // 1.2.3 == 1.2.3 (exact match)
-            Triple(Operator.Eq, "1.2.3-alpha", false),  // 1.2.3 == 1.2.3-alpha is false (release != pre-release)
-            Triple(Operator.Eq, "1.2.3-beta.1", false),  // 1.2.3 == 1.2.3-beta.1 is false (release != pre-release)
-            Triple(Operator.Gt, "1.2.3-rc.2", true),  // 1.2.3 == 1.2.3-rc.2 is false (release != pre-release)
-            Triple(Operator.Eq, "1.2.3+build.123", true),  // 1.2.3 == 1.2.3+build.123 (build metadata doesn't affect equality)
-            Triple(Operator.Eq, "1.2.3+20130313144700", true),  // 1.2.3 == 1.2.3+20130313144700
-            Triple(Operator.Eq, "1.2.3+exp.sha.5114f85", true),  // 1.2.3 == 1.2.3+exp.sha.5114f85
-            Triple(Operator.Neq, "1.2.3", false),  // 1.2.3 != 1.2.3 is false (they're equal)
-            Triple(Operator.Neq, "1.2.3-alpha", true),  // 1.2.3 != 1.2.3-alpha (release != pre-release)
-            Triple(Operator.Neq, "1.2.3-beta.1", true),  // 1.2.3 != 1.2.3-beta.1 (release != pre-release)
-            Triple(Operator.Neq, "1.2.3-rc.2", true),  // 1.2.3 != 1.2.3-rc.2 (release != pre-release)
-            Triple(Operator.Neq, "1.2.3+build.123", false),  // 1.2.3 != 1.2.3+build.123 is false (build metadata doesn't affect equality)
-            Triple(Operator.Neq, "1.2.3-alpha+build.123", true),  // 1.2.3 != 1.2.3-alpha+build.123 (release != pre-release)
-        )
-    }
+                // Eq and Neq tests for semver (release != pre-release, but build metadata doesn't affect equality)
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3-alpha", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3-beta.1", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Gt, "1.2.3-rc.2", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3+build.123", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3+20130313144700", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Eq, "1.2.3+exp.sha.5114f85", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3-alpha", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3-beta.1", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3-rc.2", true),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3+build.123", false),
+                org.junit.jupiter.params.provider.Arguments.of(Operator.Neq, "1.2.3-alpha+build.123", true),
+            )
+        }
 
-    @Test
-    fun `evaluateInt returns variant value when value in list matches`() {
-        listTestData().forEach { (contextField, valueList, shouldMatch) ->
-            // Given
-            val flagKey = "test_flag"
-            val defaultValue = 10
-            val targetingKey = "user123"
-            val context = EvaluationContext(targetingKey, mapOf("app_version" to "1.2.3",
-                "age" to 35, "country" to "IND", "screen_time" to 69))
-
-            val variant = VariantElement("variant_a", VariantValue.IntegerValue(69))
-            val defaultVariant = VariantElement("variant_default", VariantValue.IntegerValue(42))
-            val allocation = AllocationElement(100, "variant_a")
-            val constraint = Constraint(contextField, Operator.In, ConstraintValue.AnythingArrayValue(valueList))
-            val rule = Rule(listOf(allocation), listOf(constraint), "1")
-            val config =
-                createTestFeature(
-                    rolloutPercentage = 100,
-                    rules = listOf(rule),
-                    variants = listOf(variant, defaultVariant),
-                    defaultAllocation = listOf(AllocationElement(100, "variant_default")),
+        @JvmStatic
+        fun listTestDataProvider(): List<org.junit.jupiter.params.provider.Arguments> {
+            return listOf(
+                org.junit.jupiter.params.provider.Arguments.of(
+                    "app_version",
+                    listOf(
+                        ArrayValue.SemverValue("1.2.1"),
+                        ArrayValue.SemverValue("1.2.3"),
+                        ArrayValue.SemverValue("1.2.3.1"),
+                    ),
+                    true
+                ),
+                org.junit.jupiter.params.provider.Arguments.of(
+                    "age",
+                    listOf(ArrayValue.IntegerValue(18), ArrayValue.IntegerValue(20)),
+                    false
+                ),
+                org.junit.jupiter.params.provider.Arguments.of(
+                    "country",
+                    listOf(
+                        ArrayValue.StringValue("USA"),
+                        ArrayValue.StringValue("fr"),
+                        ArrayValue.StringValue("UK"),
+                        ArrayValue.StringValue("IND")
+                    ),
+                    true
+                ),
+                org.junit.jupiter.params.provider.Arguments.of(
+                    "screen_time",
+                    listOf(
+                        ArrayValue.IntegerValue(100),
+                        ArrayValue.IntegerValue(101),
+                        ArrayValue.IntegerValue(69),
+                        ArrayValue.IntegerValue(70)
+                    ),
+                    true
                 )
-
-            every { evaluateCache.get<Int>(flagKey) } returns null
-
-            // When
-            val result = edgeEvaluator.evaluateInt(flagKey, defaultValue, config, context)
-
-            // Then
-            if (shouldMatch) {
-                assertEquals(69, result.value)
-                assertEquals("variant_a", result.variant)
-                assertEquals(Reason.TARGETING_MATCH, result.reason)
-            } else {
-                assertEquals(42, result.value)
-                assertEquals("variant_default", result.variant)
-                assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
-            }
+            )
         }
     }
 
-    private fun listTestData(): List<Triple<String, List<ArrayValue>, Boolean>> {
-        return listOf(
-            Triple("app_version", listOf(ArrayValue.SemverValue("1.2.1"),
-                ArrayValue.SemverValue("1.2.3"),
-                ArrayValue.SemverValue("1.2.3.1"),
-                ), true),
-            Triple("age", listOf(ArrayValue.IntegerValue(18), ArrayValue.IntegerValue(20)), false),
-            Triple("country", listOf(ArrayValue.StringValue("USA"), ArrayValue.StringValue("fr"),
-                ArrayValue.StringValue("UK"), ArrayValue.StringValue("IND")), true),
-            Triple("screen_time", listOf(ArrayValue.IntegerValue(100),
-                ArrayValue.IntegerValue(101),
-                ArrayValue.IntegerValue(69), ArrayValue.IntegerValue(70)), true)
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.MethodSource("listTestDataProvider")
+    fun `evaluateInt returns variant value when value in list matches parameterized`(
+        contextField: String, valueList: List<ArrayValue>, shouldMatch: Boolean
+    ) {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = 10
+        val targetingKey = "user123"
+        val context = EvaluationContext(
+            targetingKey,
+            mapOf(
+                "app_version" to "1.2.3",
+                "age" to 35,
+                "country" to "IND",
+                "screen_time" to 69
+            )
         )
-    }
 
+        val variant = VariantElement("variant_a", VariantValue.IntegerValue(69))
+        val defaultVariant = VariantElement("variant_default", VariantValue.IntegerValue(42))
+        val allocation = AllocationElement(100, "variant_a")
+        val constraint = Constraint(contextField, Operator.In, ConstraintValue.AnythingArrayValue(valueList))
+        val rule = Rule(listOf(allocation), listOf(constraint), "1")
+        val config =
+            createTestFeature(
+                rolloutPercentage = 100,
+                rules = listOf(rule),
+                variants = listOf(variant, defaultVariant),
+                defaultAllocation = listOf(AllocationElement(100, "variant_default")),
+            )
+
+        every { evaluateCache.get<Int>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateInt(flagKey, defaultValue, config, context)
+
+        // Then
+        if (shouldMatch) {
+            assertEquals(69, result.value)
+            assertEquals("variant_a", result.variant)
+            assertEquals(Reason.TARGETING_MATCH, result.reason)
+        } else {
+            assertEquals(42, result.value)
+            assertEquals("variant_default", result.variant)
+            assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
+        }
+    }
     // ========== Helper Methods ==========
 
     private fun createTestFeature(

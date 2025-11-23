@@ -64,6 +64,16 @@ android {
             isReturnDefaultValues = true
         }
     }
+
+    tasks.withType<Test> {
+        useJUnitPlatform {
+            includeEngines("junit-jupiter")
+        }
+        testLogging {
+            events("passed", "skipped", "failed")
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
 }
 
 dependencies {
@@ -81,8 +91,17 @@ dependencies {
     // Semver version comparison
     implementation(libs.java.semver)
 
-    testImplementation(libs.junit)
+    // Use JUnit Platform BOM to ensure all JUnit 5 dependencies are aligned
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:1.14.6")
+    
+    // Exclude JUnit 4 from transitive dependencies
+    configurations.testImplementation.get().exclude(group = "junit", module = "junit")
+    
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -8,8 +8,8 @@ import com.flagship.sdk.plugins.transport.http.MockResponseInterceptor
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class JsonParsingTest {
     private val json =

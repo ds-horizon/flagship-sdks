@@ -2,8 +2,8 @@ package com.flagship.sdk
 
 import com.flagship.sdk.facade.jsonToValue
 import dev.openfeature.kotlin.sdk.Value
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class ValueUtilityTest {
     @Test
