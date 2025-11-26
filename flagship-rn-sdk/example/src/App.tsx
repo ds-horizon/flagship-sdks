@@ -197,16 +197,14 @@ export default function App() {
           </Text>
         </View>
       )}
-      {Platform.OS === 'android' && (
-        <TouchableOpacity
-          style={[styles.button, styles.nativeButton]}
-          onPress={() => {
-            NativeNavigation?.openNativeFeatureFlagScreen();
-          }}
-        >
-          <Text style={styles.buttonText}>Open Native Android Screen</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity
+        style={[styles.button, styles.nativeButton]}
+        onPress={() => {
+          NativeNavigation?.openNativeFeatureFlagScreen();
+        }}
+      >
+        <Text style={styles.buttonText}>Open Native {Platform.OS === 'android' ? 'Android' : 'iOS'} Screen</Text>
+      </TouchableOpacity>
     </View>
   );
 }

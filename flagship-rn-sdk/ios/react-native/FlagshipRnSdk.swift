@@ -19,6 +19,11 @@ class FlagshipRnSdkImpl: NSObject {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     DispatchQueue.main.async {
+      if FlagshipState.shared.isInitialized {
+        resolve(true)
+        return
+      }
+      
       guard let baseUrl = config["baseUrl"] as? String, !baseUrl.isEmpty else {
         reject("CONFIG_ERROR", "baseUrl is required and must not be empty", nil)
         return
@@ -41,6 +46,7 @@ class FlagshipRnSdkImpl: NSObject {
         let provider = FlagshipOpenFeatureProvider(config: flagshipConfig)
         OpenFeatureAPI.shared.setProvider(provider: provider)
         
+        FlagshipState.shared.markInitialized()
         resolve(true)
       } catch let error {
         reject("INIT_ERROR", "Initialization failed: \(error.localizedDescription)", error)
