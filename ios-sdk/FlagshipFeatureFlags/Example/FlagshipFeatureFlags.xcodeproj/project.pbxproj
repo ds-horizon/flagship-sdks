@@ -14,6 +14,8 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		892C2D892ECDF2770023CE64 /* SemverUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892C2D882ECDF2770023CE64 /* SemverUtility.swift */; };
+		714CA28FA022C7A6192AB0A4 /* FlagEvaluationFunctionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CA82867050BBB1DB3EAFDA /* FlagEvaluationFunctionalTests.swift */; };
+		800C2ACDF34C02397FB62AB2 /* ConstraintValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A953E501D06F67FE796E2FB7 /* ConstraintValidationTests.swift */; };
 		A19C0533248C765739E742C6 /* Pods_FlagshipFeatureFlags_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAFDB0329333CC5F26A23305 /* Pods_FlagshipFeatureFlags_Example.framework */; };
 		E65FE3B3DF0E32CE02E639F0 /* Pods_FlagshipFeatureFlags_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F9588B34D70FF32BAF225E5 /* Pods_FlagshipFeatureFlags_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -44,6 +46,8 @@
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		6C7711450C8AF33D24BEC1B7 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		892C2D882ECDF2770023CE64 /* SemverUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemverUtility.swift; sourceTree = "<group>"; };
+		17CA82867050BBB1DB3EAFDA /* FlagEvaluationFunctionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlagEvaluationFunctionalTests.swift; sourceTree = "<group>"; };
+		A953E501D06F67FE796E2FB7 /* ConstraintValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstraintValidationTests.swift; sourceTree = "<group>"; };
 		896389862E8C6C660054C34A /* OpenFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OpenFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		910EB7D02BE958C3D3F647D1 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		A0E44F30C051CF3E70599330 /* FlagshipFeatureFlags.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = FlagshipFeatureFlags.podspec; path = ../FlagshipFeatureFlags.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
@@ -130,6 +134,8 @@
 			children = (
 				892C2D882ECDF2770023CE64 /* SemverUtility.swift */,
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
+				17CA82867050BBB1DB3EAFDA /* FlagEvaluationFunctionalTests.swift */,
+				A953E501D06F67FE796E2FB7 /* ConstraintValidationTests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -328,6 +334,8 @@
 			files = (
 				892C2D892ECDF2770023CE64 /* SemverUtility.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
+				714CA28FA022C7A6192AB0A4 /* FlagEvaluationFunctionalTests.swift in Sources */,
+				800C2ACDF34C02397FB62AB2 /* ConstraintValidationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
