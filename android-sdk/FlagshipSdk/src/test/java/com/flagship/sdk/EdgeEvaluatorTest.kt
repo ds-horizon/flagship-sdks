@@ -500,6 +500,7 @@ class EdgeEvaluatorTest {
         val allocation = AllocationElement(100, "variant_e")
         val constraint = Constraint("premium", Operator.Eq, ConstraintValue.BoolValue(true))
         val rule = Rule(listOf(allocation), listOf(constraint), "1")
+
         val config =
             createTestFeature(
                 rolloutPercentage = 100,

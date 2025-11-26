@@ -10,7 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.flagship.sdk.facade.FlagShipClient
 import com.flagship.sdk.facade.FlagShipConfig
 import kotlinx.serialization.Serializable
-import org.json.JSONObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 class TestFeatureFlagsActivity : AppCompatActivity() {
     private lateinit var etFlagKey: EditText
@@ -107,7 +111,7 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
             val cards: Int,
         )
 
-        val testObj = JSONObject().apply {
+        val testObj = buildJsonObject {
             put("layout" , "vertical")
             put("theme" , "dark")
             put("cards" , 3)
@@ -117,16 +121,16 @@ class TestFeatureFlagsActivity : AppCompatActivity() {
             val result =
                 flagshipClient?.getJson(
                     key = flagKey,
-                    defaultValue = testObj.toString(),
+                    defaultValue = testObj,
                     targetingKey = targetingKey,
                     context = getContext(),
                 )
 
-            // For object flags, SDK currently returns a JSON object/string. Parse it instead of casting to TestObj.
-            val jsonObject = JSONObject(result!!.value)
-            val layout = jsonObject.getString("layout")
-             val theme = jsonObject.getString("theme")
-            val cards = jsonObject.getInt("cards")
+            // For object flags, SDK currently returns a JsonObject from kotlinx.serialization.json
+            val jsonObject: JsonObject? = result?.value
+            val layout = jsonObject?.get("layout")?.jsonPrimitive?.content ?: ""
+            val theme = jsonObject?.get("theme")?.jsonPrimitive?.content ?: ""
+            val cards = jsonObject?.get("cards")?.jsonPrimitive?.intOrNull ?: 0
             val resultText =
                 """
                 🔵 OBJECT FLAG TEST
