@@ -31,7 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.flagship.androidsdk.ui.theme.AndroidsdkTheme
 import com.flagship.sdk.facade.FlagShipClient
 import com.flagship.sdk.facade.FlagShipConfig
-import org.json.JSONObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
@@ -204,18 +205,18 @@ fun MainScreen(
 
         Button(
             onClick = {
-                val defaultObj = JSONObject().apply {
+                val defaultObj = buildJsonObject {
                     put("limit", 10)
                     put("enabled", false)
                 }
                 val result =
                     flagshipClient?.getJson(
                         key = "recommendations_config",
-                        defaultValue = defaultObj.toString(),
+                        defaultValue = defaultObj,
                         targetingKey = "3456",
                         context = defaultContext,
                     )
-                objectValue = result?.value
+                objectValue = result?.value?.toString()
             },
             enabled = isInitialized,
             modifier = Modifier.fillMaxWidth(),
