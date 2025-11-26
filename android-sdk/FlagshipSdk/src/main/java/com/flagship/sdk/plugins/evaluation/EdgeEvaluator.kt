@@ -56,6 +56,9 @@ class EdgeEvaluator(
             for (rule in config.rules) {
                 val isMatch = checkRuleConstraints(rule, context)
                 if (isMatch) {
+                    if (rule.allocations.isNullOrEmpty()) {
+                        return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                    }
                     val allocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, rule.allocations, rule.ruleName)
                     val variant = getVariantValue(config.variants, allocation)
                     return@run AllocationUtility.buildBooleanResultFromVariant(variant, defaultValue, Reason.TARGETING_MATCH)
@@ -64,6 +67,9 @@ class EdgeEvaluator(
 
             val defaultRule = config.defaultRule
             if (defaultRule != null) {
+                if (defaultRule.allocation.isNullOrEmpty()) {
+                    return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                }
                 val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
                 val defaultVariant = getVariantValue(config.variants, defaultAllocation)
                 return@run AllocationUtility.buildBooleanResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
@@ -105,6 +111,9 @@ class EdgeEvaluator(
             for (rule in config.rules) {
                 val isMatch = checkRuleConstraints(rule, context)
                 if (isMatch) {
+                    if (rule.allocations.isNullOrEmpty()) {
+                        return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                    }
                     val allocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, rule.allocations, rule.ruleName)
                     val variant = getVariantValue(config.variants, allocation)
                     return@run AllocationUtility.buildStringResultFromVariant(variant, defaultValue, Reason.TARGETING_MATCH)
@@ -113,6 +122,9 @@ class EdgeEvaluator(
 
             val defaultRule = config.defaultRule
             if (defaultRule != null) {
+                if (defaultRule.allocation.isNullOrEmpty()) {
+                    return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                }
                 val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
                 val defaultVariant = getVariantValue(config.variants, defaultAllocation)
                 return@run AllocationUtility.buildStringResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
@@ -136,7 +148,7 @@ class EdgeEvaluator(
             if (config == null || targetingKey.isEmpty()) {
                 return@run EvaluationResult(
                     value = defaultValue,
-                    reason = Reason.DEFAULT,
+                    reason = Reason.INVALID_FEATURE,
                 )
             }
 
@@ -154,6 +166,9 @@ class EdgeEvaluator(
             for (rule in config.rules) {
                 val isMatch = checkRuleConstraints(rule, context)
                 if (isMatch) {
+                    if (rule.allocations.isEmpty()) {
+                        return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                    }
                     val allocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, rule.allocations, rule.ruleName)
                     val variant = getVariantValue(config.variants, allocation)
                     return@run AllocationUtility.buildIntResultFromVariant(variant, defaultValue, Reason.TARGETING_MATCH)
@@ -162,6 +177,9 @@ class EdgeEvaluator(
 
             val defaultRule = config.defaultRule
             if (defaultRule != null) {
+                if (defaultRule.allocation.isEmpty()) {
+                    return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                }
                 val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
                 val defaultVariant = getVariantValue(config.variants, defaultAllocation)
                 return@run AllocationUtility.buildIntResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
@@ -203,6 +221,9 @@ class EdgeEvaluator(
             for (rule in config.rules) {
                 val isMatch = checkRuleConstraints(rule, context)
                 if (isMatch) {
+                    if (rule.allocations.isNullOrEmpty()) {
+                        return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                    }
                     val allocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, rule.allocations, rule.ruleName)
                     val variant = getVariantValue(config.variants, allocation)
                     return@run AllocationUtility.buildDoubleResultFromVariant(variant, defaultValue, Reason.TARGETING_MATCH)
@@ -211,6 +232,9 @@ class EdgeEvaluator(
 
             val defaultRule = config.defaultRule
             if (defaultRule != null) {
+                if (defaultRule.allocation.isNullOrEmpty()) {
+                    return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                }
                 val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
                 val defaultVariant = getVariantValue(config.variants, defaultAllocation)
                 return@run AllocationUtility.buildDoubleResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)
@@ -253,6 +277,9 @@ class EdgeEvaluator(
             for (rule in config.rules) {
                 val isMatch = checkRuleConstraints(rule, context)
                 if (isMatch) {
+                    if (rule.allocations.isEmpty()) {
+                        return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                    }
                     val allocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, rule.allocations, rule.ruleName)
                     val variant = getVariantValue(config.variants, allocation)
                     return@run AllocationUtility.buildObjectResultFromVariant(variant, defaultValue, Reason.TARGETING_MATCH)
@@ -261,6 +288,9 @@ class EdgeEvaluator(
 
             val defaultRule = config.defaultRule
             if (defaultRule != null) {
+                if (defaultRule.allocation.isNullOrEmpty()) {
+                    return@run EvaluationResult(value = defaultValue, reason = Reason.ERROR)
+                }
                 val defaultAllocation = AllocationUtility.allocationBucketFor(flagKey, targetingKey, defaultRule.allocation, defaultRule.ruleName)
                 val defaultVariant = getVariantValue(config.variants, defaultAllocation)
                 return@run AllocationUtility.buildObjectResultFromVariant(defaultVariant, defaultValue, Reason.DEFAULT_TARGETING_MATCH)

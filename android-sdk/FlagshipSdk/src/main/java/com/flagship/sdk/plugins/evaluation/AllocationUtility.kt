@@ -274,6 +274,7 @@ object AllocationUtility {
         val casted: T = when (defaultValue) {
             // For getJson callers we return compact JSON string
             is String -> jsonObject.toString() as T
+            is JsonObject -> jsonObject as T
             // If caller expects a Map-like structure, convert JsonObject into a Map<String, Any?> recursively
             is Map<*, *> -> jsonObjectToMap(jsonObject) as T
             // If caller passes through a JsonObject default, return JsonObject

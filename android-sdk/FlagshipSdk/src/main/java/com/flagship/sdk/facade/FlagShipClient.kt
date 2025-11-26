@@ -10,6 +10,7 @@ import com.flagship.sdk.core.registry.Registry
 import com.flagship.sdk.facade.coroutines.SdkScope
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 class FlagShipClient(
     domain: String,
@@ -109,10 +110,10 @@ class FlagShipClient(
 
     fun getJson(
         key: String,
-        defaultValue: String = "",
+        defaultValue: JsonObject,
         targetingKey: String,
         context: Map<String, Any?>,
-    ): EvaluationResult<String> {
+    ): EvaluationResult<JsonObject> {
         val config = repository?.getFlagConfig(key)
         return evaluator?.evaluateObject(
             key,

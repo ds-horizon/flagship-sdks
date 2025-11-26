@@ -868,7 +868,7 @@ class EdgeEvaluatorTest {
             rolloutPercentage = rolloutPercentage,
             rules = rules,
             type = Type.Boolean,
-            updatedAt = System.currentTimeMillis().toDouble(),
+            updatedAt = System.currentTimeMillis(),
             variants = variants,
         )
 }

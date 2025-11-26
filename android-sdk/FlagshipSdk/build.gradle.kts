@@ -98,6 +98,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:1.14.6")
+    testImplementation(libs.wiremock.jre8)
     
     // Exclude JUnit 4 from transitive dependencies
     configurations.testImplementation.get().exclude(group = "junit", module = "junit")

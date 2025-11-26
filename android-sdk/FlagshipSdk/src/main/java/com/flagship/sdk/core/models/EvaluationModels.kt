@@ -46,4 +46,7 @@ enum class Reason {
 
     // / The resolved value was the result of an error.
     ERROR,
+
+    /// The return value is there because there is no such feature
+    INVALID_FEATURE
 }
