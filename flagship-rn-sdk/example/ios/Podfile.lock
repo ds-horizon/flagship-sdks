@@ -5,7 +5,7 @@ PODS:
   - FBLazyVector (0.79.2)
   - FlagshipFeatureFlags (0.2.95):
     - OpenFeature (= 0.3.0)
-  - FlagshipRnSdk (0.2.4):
+  - FlagshipRnSdk (0.2.6):
     - DoubleConversion
     - FlagshipFeatureFlags (= 0.2.95)
     - glog
@@ -1917,7 +1917,7 @@ SPEC CHECKSUMS:
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
   FBLazyVector: 84b955f7b4da8b895faf5946f73748267347c975
   FlagshipFeatureFlags: 4eccfcebfb083ca45862300b33d15f3f00894644
-  FlagshipRnSdk: 19ed8ec7a152f5f4065c7cef2d304dd36f5c2187
+  FlagshipRnSdk: 660b2065d0d49271140629fd4e8b6f0ed0559230
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 314be5250afa5692b57b4dd1705959e1973a8ebe

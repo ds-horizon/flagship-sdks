@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Platform, NativeModules } from 'react-native';
 import { multiply, initialize, setContext, getBooleanValue, getStringValue, getIntegerValue, getDoubleValue, getObjectValue } from '@d11/flagship-rn-sdk';
+
+const { NativeNavigation } = NativeModules;
 
 const result = multiply(3, 7);
 
@@ -195,6 +197,14 @@ export default function App() {
           </Text>
         </View>
       )}
+      <TouchableOpacity
+        style={[styles.button, styles.nativeButton]}
+        onPress={() => {
+          NativeNavigation?.openNativeFeatureFlagScreen();
+        }}
+      >
+        <Text style={styles.buttonText}>Open Native {Platform.OS === 'android' ? 'Android' : 'iOS'} Screen</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -253,5 +263,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  nativeButton: {
+    backgroundColor: '#4CAF50',
   },
 });

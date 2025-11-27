@@ -11,6 +11,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		892C2DA82ED72E380023CE64 /* NativeNavigationModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892C2DA72ED72E380023CE64 /* NativeNavigationModule.swift */; };
+		892C2DA92ED72E380023CE64 /* NativeNavigationModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 892C2DA62ED72E380023CE64 /* NativeNavigationModule.m */; };
+		892C2DAA2ED72E380023CE64 /* NativeFeatureFlagViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892C2DA52ED72E380023CE64 /* NativeFeatureFlagViewController.swift */; };
 		B5367BBF2C6115B78846939E /* Pods_FlagshipRnSdkExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C00F583EAA8351E3795515E9 /* Pods_FlagshipRnSdkExample.framework */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +26,11 @@
 		5709B34CF0A7D63546082F79 /* Pods-FlagshipRnSdkExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlagshipRnSdkExample.release.xcconfig"; path = "Target Support Files/Pods-FlagshipRnSdkExample/Pods-FlagshipRnSdkExample.release.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = FlagshipRnSdkExample/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = FlagshipRnSdkExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		892C2DA42ED72E380023CE64 /* FlagshipRnSdkExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FlagshipRnSdkExample-Bridging-Header.h"; sourceTree = "<group>"; };
+		892C2DA52ED72E380023CE64 /* NativeFeatureFlagViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeFeatureFlagViewController.swift; sourceTree = "<group>"; };
+		892C2DA62ED72E380023CE64 /* NativeNavigationModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeNavigationModule.m; sourceTree = "<group>"; };
+		892C2DA72ED72E380023CE64 /* NativeNavigationModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeNavigationModule.swift; sourceTree = "<group>"; };
+		892C2DAB2ED72E560023CE64 /* FlagshipRnSdkExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FlagshipRnSdkExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		C00F583EAA8351E3795515E9 /* Pods_FlagshipRnSdkExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FlagshipRnSdkExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -42,11 +50,16 @@
 		13B07FAE1A68108700A75B9A /* FlagshipRnSdkExample */ = {
 			isa = PBXGroup;
 			children = (
+				892C2DA42ED72E380023CE64 /* FlagshipRnSdkExample-Bridging-Header.h */,
+				892C2DA52ED72E380023CE64 /* NativeFeatureFlagViewController.swift */,
+				892C2DA62ED72E380023CE64 /* NativeNavigationModule.m */,
+				892C2DA72ED72E380023CE64 /* NativeNavigationModule.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				892C2DAB2ED72E560023CE64 /* FlagshipRnSdkExample-Bridging-Header.h */,
 			);
 			name = FlagshipRnSdkExample;
 			sourceTree = "<group>";
@@ -131,7 +144,7 @@
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1620;
 					};
 				};
 			};
@@ -246,6 +259,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				892C2DA82ED72E380023CE64 /* NativeNavigationModule.swift in Sources */,
+				892C2DA92ED72E380023CE64 /* NativeNavigationModule.m in Sources */,
+				892C2DAA2ED72E380023CE64 /* NativeFeatureFlagViewController.swift in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -275,6 +291,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = flagshiprnsdk.example;
 				PRODUCT_NAME = FlagshipRnSdkExample;
+				SWIFT_OBJC_BRIDGING_HEADER = "FlagshipRnSdkExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -302,6 +319,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = flagshiprnsdk.example;
 				PRODUCT_NAME = FlagshipRnSdkExample;
+				SWIFT_OBJC_BRIDGING_HEADER = "FlagshipRnSdkExample-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
