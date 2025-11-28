@@ -14,6 +14,7 @@ import com.flagship.sdk.core.models.VariantElement
 import com.flagship.sdk.core.models.VariantValue
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.serializer
 
 object FeatureCreateUtils {
     val json = Json {
@@ -121,6 +122,10 @@ object FeatureCreateUtils {
         SINGLE,
         THREE_WAY,
         CUSTOM,
+
+        GT_HUNDRED,
+
+        LT_HUNDRED
     }
 
     /**
@@ -212,8 +217,9 @@ object FeatureCreateUtils {
         contextFields: List<String>,
         allocationStrategy: AllocationStrategy = AllocationStrategy.FIFTY_FIFTY,
         variantKeys: List<String> = emptyList(),
+        evaluateToFalse: Boolean = false
     ): Rule {
-        val constraints = generateDemoConstraints(contextFields)
+        val constraints = generateDemoConstraints(contextFields, evaluateToFalse)
 
         val allocations: List<AllocationElement> = if (variantKeys.isEmpty()) {
             emptyList()
@@ -240,6 +246,22 @@ object FeatureCreateUtils {
                     }
                     createAllocations(variantKeys, percentages)
                 }
+                AllocationStrategy.LT_HUNDRED -> {
+                    require(variantKeys.size >= 2) { "LT_HUNDRED requires at least 2 variant keys" }
+                    // Create allocations that sum to less than 100 (e.g., 30, 40 = 70)
+                    val percentages = listOf(30L, 40L) + variantKeys.drop(2).map { 0L }
+                    variantKeys.zip(percentages).map { (key, percentage) ->
+                        AllocationElement(percentage = percentage, variantKey = key)
+                    }
+                }
+                AllocationStrategy.GT_HUNDRED -> {
+                    require(variantKeys.size >= 2) { "GT_HUNDRED requires at least 2 variant keys" }
+                    // Create allocations that sum to more than 100 (e.g., 60, 50 = 110)
+                    val percentages = listOf(60L, 50L) + variantKeys.drop(2).map { 0L }
+                    variantKeys.zip(percentages).map { (key, percentage) ->
+                        AllocationElement(percentage = percentage, variantKey = key)
+                    }
+                }
             }
         }
 
@@ -258,6 +280,7 @@ object FeatureCreateUtils {
     @JvmStatic
     fun generateDemoConstraints(
         contextFields: List<String>,
+        evaluateToFalse: Boolean = false
     ): List<Constraint> {
         val cohortField = "cohort"
         val valueMap = getDefaultContextWithCohort()
@@ -275,14 +298,16 @@ object FeatureCreateUtils {
                         else -> null
                     }
                 }
-                createConstraint(field, Operator.In, arrayValues)
+                createConstraint(field, Operator.Ct, arrayValues)
             } else {
+                val operator = if (evaluateToFalse) Operator.Neq else Operator.Eq
+
                 when (value) {
-                    is Boolean -> createConstraint(field, Operator.Eq, value)
-                    is Long -> createConstraint(field, Operator.Eq, value)
-                    is Int -> createConstraint(field, Operator.Eq, value.toLong())
-                    is Double -> createConstraint(field, Operator.Eq, value)
-                    is String -> createConstraint(field, Operator.Eq, value)
+                    is Boolean -> createConstraint(field, operator, value)
+                    is Long -> createConstraint(field, operator, value)
+                    is Int -> createConstraint(field, operator, value.toLong())
+                    is Double -> createConstraint(field, operator, value)
+                    is String -> createConstraint(field, operator, value)
                     is List<*> -> {
                         // Convert list to ArrayValue list for Operator.In
                         val arrayValues = value.mapNotNull { item ->
