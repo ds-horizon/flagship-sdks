@@ -10,6 +10,7 @@ import com.flagship.sdk.core.registry.Registry
 import com.flagship.sdk.facade.coroutines.SdkScope
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 
 class FlagShipClient(
     domain: String,
@@ -39,12 +40,23 @@ class FlagShipClient(
         context: Map<String, Any?>,
     ): EvaluationResult<Boolean> {
         val config = repository?.getFlagConfig(key)
-        return evaluator?.evaluateBoolean(
-            key,
-            defaultValue,
-            config,
-            EvaluationContext(targetingKey, context),
-        ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+
+        try {
+            return evaluator?.evaluateBoolean(
+                key,
+                defaultValue,
+                config,
+                EvaluationContext(targetingKey, context),
+            ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        } catch (e: Exception) {
+            Log.e("Flagship", "Error evaluating boolean flag", e)
+            val errorMessage: String = e.message ?: "Unknown error"
+            return EvaluationResult(
+                value = defaultValue,
+                reason = Reason.ERROR,
+                metadata = mapOf("error" to errorMessage),
+            )
+        }
     }
 
     fun getString(
@@ -54,12 +66,22 @@ class FlagShipClient(
         context: Map<String, Any?>,
     ): EvaluationResult<String> {
         val config = repository?.getFlagConfig(key)
-        return evaluator?.evaluateString(
-            key,
-            defaultValue,
-            config,
-            EvaluationContext(targetingKey, context),
-        ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        try {
+            return evaluator?.evaluateString(
+                key,
+                defaultValue,
+                config,
+                EvaluationContext(targetingKey, context),
+            ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        } catch (e: Exception) {
+            Log.e("Flagship", "Error evaluating string flag", e)
+            val errorMessage: String = e.message ?: "Unknown error"
+            return EvaluationResult(
+                value = defaultValue,
+                reason = Reason.ERROR,
+                metadata = mapOf("error" to errorMessage),
+            )
+        }
     }
 
     fun getInt(
@@ -69,12 +91,22 @@ class FlagShipClient(
         context: Map<String, Any?>,
     ): EvaluationResult<Int> {
         val config = repository?.getFlagConfig(key)
-        return evaluator?.evaluateInt(
-            key,
-            defaultValue,
-            config,
-            EvaluationContext(targetingKey, context),
-        ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        try {
+            return evaluator?.evaluateInt(
+                key,
+                defaultValue,
+                config,
+                EvaluationContext(targetingKey, context),
+            ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        } catch (e: Exception) {
+            Log.e("Flagship", "Error evaluating int flag", e)
+            val errorMessage: String = e.message ?: "Unknown error"
+            return EvaluationResult(
+                value = defaultValue,
+                reason = Reason.ERROR,
+                metadata = mapOf("error" to errorMessage),
+            )
+        }
     }
 
     fun getDouble(
@@ -84,12 +116,22 @@ class FlagShipClient(
         context: Map<String, Any?>,
     ): EvaluationResult<Double> {
         val config = repository?.getFlagConfig(key)
-        return evaluator?.evaluateDouble(
-            key,
-            defaultValue,
-            config,
-            EvaluationContext(targetingKey, context),
-        ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        try {
+            return evaluator?.evaluateDouble(
+                key,
+                defaultValue,
+                config,
+                EvaluationContext(targetingKey, context),
+            ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        } catch (e: Exception) {
+            Log.e("Flagship", "Error evaluating double flag", e)
+            val errorMessage: String = e.message ?: "Unknown error"
+            return EvaluationResult(
+                value = defaultValue,
+                reason = Reason.ERROR,
+                metadata = mapOf("error" to errorMessage),
+            )
+        }
     }
 
     fun <T> getObject(
@@ -99,27 +141,47 @@ class FlagShipClient(
         context: Map<String, Any?>,
     ): EvaluationResult<T> {
         val config = repository?.getFlagConfig(key)
-        return evaluator?.evaluateObject(
-            key,
-            defaultValue,
-            config,
-            EvaluationContext(targetingKey, context),
-        ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        try {
+            return evaluator?.evaluateObject(
+                key,
+                defaultValue,
+                config,
+                EvaluationContext(targetingKey, context),
+            ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        } catch (e: Exception) {
+            Log.e("Flagship", "Error evaluating object flag", e)
+            val errorMessage: String = e.message ?: "Unknown error"
+            return EvaluationResult(
+                value = defaultValue,
+                reason = Reason.ERROR,
+                metadata = mapOf("error" to errorMessage),
+            )
+        }
     }
 
     fun getJson(
         key: String,
-        defaultValue: String = "",
+        defaultValue: JsonObject,
         targetingKey: String,
         context: Map<String, Any?>,
-    ): EvaluationResult<String> {
+    ): EvaluationResult<JsonObject> {
         val config = repository?.getFlagConfig(key)
-        return evaluator?.evaluateObject(
-            key,
-            defaultValue,
-            config,
-            EvaluationContext(targetingKey, context),
-        ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        try {
+            return evaluator?.evaluateObject(
+                key,
+                defaultValue,
+                config,
+                EvaluationContext(targetingKey, context),
+            ) ?: EvaluationResult(value = defaultValue, reason = Reason.UNKNOWN)
+        } catch (e: Exception) {
+            Log.e("Flagship", "Error evaluating json flag", e)
+            val errorMessage: String = e.message ?: "Unknown error"
+            return EvaluationResult(
+                value = defaultValue,
+                reason = Reason.ERROR,
+                metadata = mapOf("error" to errorMessage),
+            )
+        }
     }
 
     fun onContextChange(

@@ -67,7 +67,7 @@ data class Feature(
      * Epoch timestamp (in seconds) when the flag was last updated
      */
     @SerialName("updated_at")
-    val updatedAt: Double,
+    val updatedAt: Long,
     /**
      * Variants of the flag. All variants will have the same value type
      */
@@ -373,23 +373,23 @@ object VariantValueSerializer : KSerializer<VariantValue> {
         val element = jsonDecoder.decodeJsonElement()
 
         return when {
+            element is JsonObject -> {
+                VariantValue.AnythingMapValue(element)
+            }
+
             element is JsonPrimitive && element.isString ->
                 VariantValue.StringValue(element.content)
 
             element is JsonPrimitive && element.booleanOrNull != null ->
                 VariantValue.BoolValue(element.boolean)
 
-            element is JsonPrimitive && element.doubleOrNull != null ->
-                VariantValue.DoubleValue(element.double)
-
             element is JsonPrimitive && element.longOrNull != null ->
                 VariantValue.IntegerValue(
                     element.long,
                 )
 
-            element is JsonObject -> {
-                VariantValue.AnythingMapValue(element)
-            }
+            element is JsonPrimitive && element.doubleOrNull != null ->
+                VariantValue.DoubleValue(element.double)
 
             else -> throw SerializationException("Unknown VariantValue type: $element")
         }

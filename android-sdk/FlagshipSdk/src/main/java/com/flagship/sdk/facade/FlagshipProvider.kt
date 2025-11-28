@@ -8,6 +8,9 @@ import dev.openfeature.kotlin.sdk.Hook
 import dev.openfeature.kotlin.sdk.ProviderEvaluation
 import dev.openfeature.kotlin.sdk.ProviderMetadata
 import dev.openfeature.kotlin.sdk.Value
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class FlagshipProvider(
     domain: String,
@@ -71,18 +74,16 @@ class FlagshipProvider(
         defaultValue: Value,
         context: EvaluationContext?,
     ): ProviderEvaluation<Value> {
-        val proxyDefaultValue =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".random().toString()
-
+        val defaultJson = valueToJson(defaultValue)
         val evaluated =
             flagShipClient.getJson(
                 key,
-                proxyDefaultValue,
+                defaultJson,
                 context?.getTargetingKey() ?: "",
                 context.sanitizeEvaluationContext(),
             )
 
-        if (evaluated.value == proxyDefaultValue) {
+        if (evaluated.value == defaultJson) {
             return mapEvaluation(
                 EvaluationResult(
                     value = defaultValue,
@@ -96,7 +97,7 @@ class FlagshipProvider(
         val evaluatedValue =
             EvaluationResult(
                 value =
-                    jsonToValue(evaluated.value).run {
+                    jsonToValue(evaluated.value.toString()).run {
                         if (this is Value.Null) {
                             defaultValue
                         } else {

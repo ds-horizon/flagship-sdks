@@ -43,7 +43,7 @@ class Registry(
                 baseUrl = config.baseUrl,
                 flagshipApiKey = config.flagshipApiKey,
                 enableLogging = false,
-                mockInterceptors = emptyList(),
+                mockInterceptors = config.mockInterceptors,
             )
         store = initializeStorage(config.applicationContext)
         repository =
