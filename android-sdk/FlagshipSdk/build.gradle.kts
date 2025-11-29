@@ -111,7 +111,7 @@ publishing {
         create<MavenPublication>("bar") {
             groupId = "com.dream11"
             artifactId = "flagship-sdk"
-            version = "0.0.65"
+            version = "0.0.66"
             artifact("${layout.buildDirectory.get()}/outputs/aar/FlagshipSdk-release.aar")
 
             pom {
@@ -120,7 +120,7 @@ publishing {
                 url.set("https://github.com/ds-horizon/flagship-sdks")
                 licenses {
                     license {
-                        name.set("Plugger License")
+                        name.set("Flagship License")
                         url.set("https://github.com/ds-horizon/flagship-sdks/blob/main/flagship-rn-sdk/LICENSE.md")
                     }
                 }
