@@ -1,6 +1,6 @@
 {
   "name": "@d11/flagship-rn-sdk",
-  "version": "0.2.6",
+  "version": "0.2.8",
   "description": "Feature Flag Management",
   "module": "./lib/module/index.js",
   "main": "./lib/module/index.js",
