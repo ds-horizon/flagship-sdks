@@ -313,6 +313,7 @@ object ConstraintValueSerializer : KSerializer<ConstraintValue> {
  */
 @Serializable
 enum class Type {
+    @SerialName("integer")
     Integer,
 
     @SerialName("object")
