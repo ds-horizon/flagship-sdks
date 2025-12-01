@@ -70,7 +70,9 @@ class EdgeEvaluator(
             }
             return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
-            evaluateCache.put(flagKey, it.value)
+            if(it.reason != Reason.DEFAULT) {
+                evaluateCache.put(flagKey, it.value)
+            }
         }
     }
 
@@ -119,7 +121,9 @@ class EdgeEvaluator(
             }
             return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
-            evaluateCache.put(flagKey, it.value)
+            if(it.reason != Reason.DEFAULT) {
+                evaluateCache.put(flagKey, it.value)
+            }
         }
     }
 
@@ -168,7 +172,9 @@ class EdgeEvaluator(
             }
             return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
-            evaluateCache.put(flagKey, it.value)
+            if(it.reason != Reason.DEFAULT) {
+                evaluateCache.put(flagKey, it.value)
+            }
         }
     }
 
@@ -217,7 +223,9 @@ class EdgeEvaluator(
             }
             return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
-            evaluateCache.put(flagKey, it.value)
+            if(it.reason != Reason.DEFAULT) {
+                evaluateCache.put(flagKey, it.value)
+            }
         }
     }
 
@@ -267,7 +275,9 @@ class EdgeEvaluator(
             }
             return@run EvaluationResult(value = defaultValue, reason = Reason.DEFAULT)
         }.also {
-            evaluateCache.put(flagKey, it.value)
+            if(it.reason != Reason.DEFAULT) {
+                evaluateCache.put(flagKey, it.value)
+            }
         }
     }
 

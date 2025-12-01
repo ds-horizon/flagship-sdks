@@ -66,19 +66,17 @@ class EdgeEvaluatorTest {
     }
 
     @Test
-    fun `evaluateBoolean returns default when config is null`() {
+    fun `evaluateBoolean returns default when config is null and does not cache`() {
         // Given
         val flagKey = "test_flag"
         val defaultValue = false
         every { evaluateCache.get<Boolean>(flagKey) } returns null
-        every { evaluateCache.put(flagKey, defaultValue) } just Runs
 
         // When
         val result =
             edgeEvaluator.evaluateBoolean(flagKey, defaultValue, null, EvaluationContext.empty())
 
         // Then
-
         assertEquals(defaultValue, result.value)
         assertEquals(Reason.DEFAULT, result.reason)
     }
@@ -178,6 +176,39 @@ class EdgeEvaluatorTest {
         assertTrue(result.metadata.containsKey("error"))
     }
 
+    @Test
+    fun `evaluateBoolean returns default when targetingKey is empty and does not cache`() {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = false
+        val config = createTestFeature()
+        every { evaluateCache.get<Boolean>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateBoolean(flagKey, defaultValue, config, EvaluationContext.empty())
+
+        // Then
+        assertEquals(defaultValue, result.value)
+        assertEquals(Reason.DEFAULT, result.reason)
+    }
+
+    @Test
+    fun `evaluateBoolean caches result when reason is DISABLED`() {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = false
+        val config = createTestFeature(enabled = false)
+        every { evaluateCache.get<Boolean>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateBoolean(flagKey, defaultValue, config, EvaluationContext("user123", emptyMap()))
+
+        // Then
+        assertEquals(defaultValue, result.value)
+        assertEquals(Reason.DISABLED, result.reason)
+        verify { evaluateCache.put(flagKey, defaultValue) }
+    }
+
     // ========== evaluateString Tests ==========
 
     @Test
@@ -227,6 +258,21 @@ class EdgeEvaluatorTest {
     }
 
     @Test
+    fun `evaluateString returns default when config is null and does not cache`() {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = "default"
+        every { evaluateCache.get<String>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateString(flagKey, defaultValue, null, EvaluationContext.empty())
+
+        // Then
+        assertEquals(defaultValue, result.value)
+        assertEquals(Reason.DEFAULT, result.reason)
+    }
+
+    @Test
     fun `evaluateString returns default rule allocation when no rules match`() {
         val flagKey = "str_flag"
         val defaultValue = "default"
@@ -247,6 +293,7 @@ class EdgeEvaluatorTest {
         assertEquals("from_default", result.value)
         assertEquals("var_str", result.variant)
         assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
+        verify { evaluateCache.put(flagKey, "from_default") }
     }
 
     // ========== evaluateInt Tests ==========
@@ -297,6 +344,21 @@ class EdgeEvaluatorTest {
     }
 
     @Test
+    fun `evaluateInt returns default when config is null and does not cache`() {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = 0
+        every { evaluateCache.get<Int>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateInt(flagKey, defaultValue, null, EvaluationContext.empty())
+
+        // Then
+        assertEquals(defaultValue, result.value)
+        assertEquals(Reason.DEFAULT, result.reason)
+    }
+
+    @Test
     fun `evaluateInt returns default rule allocation when no rules match`() {
         val flagKey = "int_flag"
         val defaultValue = 7
@@ -315,6 +377,7 @@ class EdgeEvaluatorTest {
         assertEquals(11, result.value)
         assertEquals("var_int", result.variant)
         assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
+        verify { evaluateCache.put(flagKey, 11) }
     }
 
     // ========== evaluateDouble Tests ==========
@@ -365,6 +428,21 @@ class EdgeEvaluatorTest {
     }
 
     @Test
+    fun `evaluateDouble returns default when config is null and does not cache`() {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = 0.0
+        every { evaluateCache.get<Double>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateDouble(flagKey, defaultValue, null, EvaluationContext.empty())
+
+        // Then
+        assertEquals(defaultValue, result.value, 0.001)
+        assertEquals(Reason.DEFAULT, result.reason)
+    }
+
+    @Test
     fun `evaluateDouble returns default rule allocation when no rules match`() {
         val flagKey = "dbl_flag"
         val defaultValue = 1.0
@@ -383,6 +461,7 @@ class EdgeEvaluatorTest {
         assertEquals(2.5, result.value, 0.001)
         assertEquals("var_dbl", result.variant)
         assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
+        verify { evaluateCache.put(flagKey, 2.5) }
     }
 
     // ========== evaluateObject Tests ==========
@@ -440,6 +519,21 @@ class EdgeEvaluatorTest {
     }
 
     @Test
+    fun `evaluateObject returns default when config is null and does not cache`() {
+        // Given
+        val flagKey = "test_flag"
+        val defaultValue = emptyMap<String, Any>()
+        every { evaluateCache.get<Map<String, Any>>(flagKey) } returns null
+
+        // When
+        val result = edgeEvaluator.evaluateObject(flagKey, defaultValue, null, EvaluationContext.empty())
+
+        // Then
+        assertEquals(defaultValue, result.value)
+        assertEquals(Reason.DEFAULT, result.reason)
+    }
+
+    @Test
     fun `evaluateObject returns default rule allocation when no rules match`() {
         val flagKey = "obj_flag"
         val defaultValue = emptyMap<String, Any>()
@@ -459,6 +553,7 @@ class EdgeEvaluatorTest {
         assertEquals(mapOf("k" to "v"), result.value)
         assertEquals("var_obj", result.variant)
         assertEquals(Reason.DEFAULT_TARGETING_MATCH, result.reason)
+        verify { evaluateCache.put(flagKey, any<Map<String, Any>>()) }
     }
 
     @Test
