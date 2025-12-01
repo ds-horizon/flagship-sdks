@@ -380,13 +380,13 @@ object VariantValueSerializer : KSerializer<VariantValue> {
             element is JsonPrimitive && element.booleanOrNull != null ->
                 VariantValue.BoolValue(element.boolean)
 
-            element is JsonPrimitive && element.doubleOrNull != null ->
-                VariantValue.DoubleValue(element.double)
-
             element is JsonPrimitive && element.longOrNull != null ->
                 VariantValue.IntegerValue(
                     element.long,
                 )
+
+            element is JsonPrimitive && element.doubleOrNull != null ->
+                VariantValue.DoubleValue(element.double)
 
             element is JsonObject -> {
                 VariantValue.AnythingMapValue(element)
