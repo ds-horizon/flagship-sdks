@@ -1,0 +1,90 @@
+name: Release Android SDK
+
+on:
+  push:
+    tags:
+      - 'android-v*.*.*'
+
+concurrency:
+  group: release-android-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Build and Publish Android SDK
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Extract version from Git tag (strip leading 'android-v' if exists)
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#android-v}" # removes 'android-v' prefix if present
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
+
+      - name: Extract version from build.gradle.kts
+        id: gradle_version
+        run: |
+          GRADLE_VERSION=$(grep 'val sdkVersion' android-sdk/FlagshipSdk/build.gradle.kts | cut -d'"' -f2)
+          echo "GRADLE_VERSION=$GRADLE_VERSION" >> $GITHUB_ENV
+
+      - name: Check if version already exists on Maven Central
+        run: |
+          GROUP_ID="com.dream11"
+          ARTIFACT_ID="flagship-sdk"
+          MAVEN_URL="https://repo1.maven.org/maven2/${GROUP_ID//.//}/${ARTIFACT_ID}/${RELEASE_VERSION}/${ARTIFACT_ID}-${RELEASE_VERSION}.pom"
+          
+          if curl --silent --head --fail "$MAVEN_URL" > /dev/null 2>&1; then
+            echo "Version $RELEASE_VERSION already exists on Maven Central."
+            exit 1
+          fi
+          echo "Version $RELEASE_VERSION is available on Maven Central"
+
+      - name: Set build.gradle.kts version (without git tag)
+        run: |
+          sed -i "s/val sdkVersion = \"[0-9]+\.[0-9]+\.[0-9]+\"/val sdkVersion = \"$RELEASE_VERSION\"/g" android-sdk/FlagshipSdk/build.gradle.kts
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./android-sdk/gradlew
+
+      - name: Create local.properties
+        run: |
+          cat > android-sdk/local.properties << EOF
+          sdk.dir=$ANDROID_HOME
+          portalUsername=${{ secrets.SONATYPE_PORTAL_USERNAME }}
+          portalPassword=${{ secrets.SONATYPE_PORTAL_PASSWORD }}
+          stagingProfileId=${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
+          ossrhUsername=${{ secrets.OSSRH_USERNAME }}
+          ossrhPassword=${{ secrets.OSSRH_PASSWORD }}
+          signing.keyId=${{ secrets.GPG_KEY_ID }}
+          signing.key=${{ secrets.GPG_SIGNING_KEY }}
+          signing.password=${{ secrets.GPG_SIGNING_PASSWORD }}
+          EOF
+
+      - name: Build and Publish to Maven Central
+        run: ./gradlew :FlagshipSdk:cleanBuildPublishFlagship --stacktrace
+        working-directory: ./android-sdk
+        env:
+          ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.GPG_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_SIGNING_PASSWORD }}

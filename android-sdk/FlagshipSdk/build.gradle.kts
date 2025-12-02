@@ -7,6 +7,8 @@ plugins {
     id("signing")
 }
 
+val sdkVersion = "0.0.67"
+
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = mutableMapOf<String, String>()
 
@@ -111,7 +113,7 @@ publishing {
         create<MavenPublication>("bar") {
             groupId = "com.dream11"
             artifactId = "flagship-sdk"
-            version = "0.0.67"
+            version = sdkVersion
             artifact("${layout.buildDirectory.get()}/outputs/aar/FlagshipSdk-release.aar")
 
             pom {
