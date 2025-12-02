@@ -111,7 +111,7 @@ publishing {
         create<MavenPublication>("bar") {
             groupId = "com.dream11"
             artifactId = "flagship-sdk"
-            version = "0.0.66"
+            version = "0.0.67"
             artifact("${layout.buildDirectory.get()}/outputs/aar/FlagshipSdk-release.aar")
 
             pom {
