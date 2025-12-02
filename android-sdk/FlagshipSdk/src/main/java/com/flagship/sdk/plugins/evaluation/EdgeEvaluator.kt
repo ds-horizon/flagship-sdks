@@ -152,7 +152,7 @@ class EdgeEvaluator(
             if (config == null || targetingKey.isEmpty()) {
                 return@run EvaluationResult(
                     value = defaultValue,
-                    reason = Reason.INVALID_FEATURE,
+                    reason = Reason.DEFAULT,
                 )
             }
 

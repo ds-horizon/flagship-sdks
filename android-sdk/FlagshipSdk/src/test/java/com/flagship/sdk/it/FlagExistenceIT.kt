@@ -101,7 +101,7 @@ class FlagExistenceIT {
 
         val flag = flagshipClient.getInt("test-flag", 69, "test-flag", defaultContext)
         assertEquals(69, flag.value)
-        assertEquals(Reason.INVALID_FEATURE, flag.reason);
+        assertEquals(Reason.DEFAULT, flag.reason);
     }
 
     @Test
