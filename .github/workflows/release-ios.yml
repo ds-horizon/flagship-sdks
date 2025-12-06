@@ -34,11 +34,23 @@ jobs:
           done
           echo "Code version ($CODE_VERSION) must be < tag version ($RELEASE_VERSION)"; exit 1
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Update podspec version and source tag
         run: |
           cd ios-sdk/FlagshipFeatureFlags
           sed -i '' "s/s.version *= *'[0-9]*\.[0-9]*\.[0-9]*'/s.version          = '$RELEASE_VERSION'/" FlagshipFeatureFlags.podspec
           sed -i '' "s/:tag => s.version.to_s/:tag => \"ios-v#{s.version}\"/" FlagshipFeatureFlags.podspec
+
+      - name: Commit and retag
+        run: |
+          git add ios-sdk/FlagshipFeatureFlags/FlagshipFeatureFlags.podspec
+          git commit -m "chore: update podspec to $RELEASE_VERSION for release"
+          git tag -f "ios-v$RELEASE_VERSION"
+          git push origin "ios-v$RELEASE_VERSION" --force
 
       - name: Install CocoaPods
         run: gem install cocoapods
