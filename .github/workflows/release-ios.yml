@@ -3,93 +3,67 @@ name: Release iOS SDK
 on:
   push:
     tags:
-      - "ios-v*.*.*" # Triggers on iOS tags like ios-v1.2.3
+      - 'ios-v*.*.*'
 
 jobs:
   release:
+    name: Build and Publish iOS SDK
     runs-on: macos-latest
-
-    permissions:
-      contents: write
-      packages: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch full history for changelog generation
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Xcode
-        uses: actions/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: "17"
-          distribution: "temurin"
-
-      - name: Extract version from tag
+      - name: Extract version from Git tag
         run: |
-          VERSION=${GITHUB_REF#refs/tags/ios-v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Publishing iOS version: $VERSION"
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#ios-v}"
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Validate code version is less than tag version
+        run: |
+          CODE_VERSION=$(grep "s.version" ios-sdk/FlagshipFeatureFlags/FlagshipFeatureFlags.podspec | head -1 | sed "s/.*'\(.*\)'/\1/")
+          IFS='.' read -ra CODE <<< "$CODE_VERSION"
+          IFS='.' read -ra REL <<< "$RELEASE_VERSION"
+          for i in 0 1 2; do
+            [[ ${CODE[$i]:-0} -lt ${REL[$i]:-0} ]] && exit 0
+            [[ ${CODE[$i]:-0} -gt ${REL[$i]:-0} ]] && { echo "Code version ($CODE_VERSION) must be < tag version ($RELEASE_VERSION)"; exit 1; }
+          done
+          echo "Code version ($CODE_VERSION) must be < tag version ($RELEASE_VERSION)"; exit 1
+
+      - name: Update podspec version and source tag
+        run: |
+          cd ios-sdk/FlagshipFeatureFlags
+          sed -i '' "s/s.version *= *'[0-9]*\.[0-9]*\.[0-9]*'/s.version          = '$RELEASE_VERSION'/" FlagshipFeatureFlags.podspec
+          sed -i '' "s/:tag => s.version.to_s/:tag => \"ios-v#{s.version}\"/" FlagshipFeatureFlags.podspec
 
       - name: Install CocoaPods
         run: gem install cocoapods
 
-      - name: Validate Podspec
+      - name: Setup CocoaPods trunk authentication
+        run: |
+          cat <<EOF > ~/.netrc
+          machine trunk.cocoapods.org
+            login ${{ secrets.COCOAPODS_TRUNK_EMAIL }}
+            password ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+          EOF
+          chmod 600 ~/.netrc
+
+      - name: Lint podspec
         run: |
           cd ios-sdk/FlagshipFeatureFlags
-          # Update version in podspec
-          sed -i '' "s/s.version.*=.*/s.version = '$VERSION'/" FlagshipFeatureFlags.podspec
-          pod lib lint --allow-warnings
+          pod lib lint FlagshipFeatureFlags.podspec --allow-warnings
 
-      - name: Generate changelog
-        id: changelog
-        run: |
-          # Get previous iOS tag for changelog
-          PREVIOUS_TAG=$(git tag --sort=-version:refname --list "ios-v*" | sed -n '2p' || echo "")
-
-          if [ -n "$PREVIOUS_TAG" ]; then
-            echo "## iOS Changes since $PREVIOUS_TAG" > changelog.md
-            git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD -- ios-sdk/ >> changelog.md
-          else
-            echo "## Initial iOS Release" > changelog.md
-            echo "First release of Flagship iOS SDK" >> changelog.md
-          fi
-
-          # Set output for use in release
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          cat changelog.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: iOS Release ${{ env.VERSION }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: ${{ contains(env.VERSION, '-') }}
-
-      - name: Archive iOS Framework
+      - name: Push to CocoaPods trunk
         run: |
           cd ios-sdk/FlagshipFeatureFlags
-          xcodebuild archive \
-            -workspace Example/FlagshipFeatureFlags.xcworkspace \
-            -scheme FlagshipFeatureFlags \
-            -destination "generic/platform=iOS" \
-            -archivePath "build/FlagshipFeatureFlags.xcarchive" \
-            SKIP_INSTALL=NO \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+          pod trunk push FlagshipFeatureFlags.podspec --allow-warnings
 
-      - name: Upload iOS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: flagship-ios-sdk-${{ env.VERSION }}
-          path: ios-sdk/FlagshipFeatureFlags/build/
-          retention-days: 30
+      - name: Bump version to next patch
+        run: |
+          chmod +x scripts/bump-version.sh
+          ./scripts/bump-version.sh ios "$RELEASE_VERSION"
+
