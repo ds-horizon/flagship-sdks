@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Usage: ./bump-version.sh <sdk-type> <current-version>
-# sdk-type: android | rnsdk
+# sdk-type: android | rnsdk | ios
 # current-version: x.y.z format
 
 SDK_TYPE="${1:-}"
@@ -11,7 +11,7 @@ CURRENT_VERSION="${2:-}"
 
 if [[ -z "$SDK_TYPE" || -z "$CURRENT_VERSION" ]]; then
   echo "Usage: $0 <sdk-type> <current-version>"
-  echo "  sdk-type: android | rnsdk"
+  echo "  sdk-type: android | rnsdk | ios"
   echo "  current-version: x.y.z format"
   exit 1
 fi
@@ -35,6 +35,15 @@ case "$SDK_TYPE" in
     cd flagship-rn-sdk
     npm version --no-git-tag-version "${NEW_VERSION}"
     cd ..
+    ;;
+  ios)
+    FILE="ios-sdk/FlagshipFeatureFlags/FlagshipFeatureFlags.podspec"
+    # macOS sed requires empty string after -i
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      sed -i '' -E "s/s\.version *= *'[^']+'/s.version          = '${NEW_VERSION}'/" "$FILE"
+    else
+      sed -i -E "s/s\.version *= *'[^']+'/s.version          = '${NEW_VERSION}'/" "$FILE"
+    fi
     ;;
   *)
     echo "Unknown sdk-type: $SDK_TYPE"
