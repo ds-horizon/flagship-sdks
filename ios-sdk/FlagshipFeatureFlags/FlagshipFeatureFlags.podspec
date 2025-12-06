@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'FlagshipFeatureFlags'
-  s.version          = '0.2.95'
+  s.version = '0.2.100'
   s.summary          = 'FlagshipHorizon OpenFeature adapter for iOS'
 
   s.description      = <<-DESC
@@ -17,10 +17,10 @@ Pod::Spec.new do |s|
                        DESC
 
   s.homepage         = 'https://github.com/ds-horizon/flagship-sdks'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.license          = { :type => 'MIT', :file => 'ios-sdk/FlagshipFeatureFlags/LICENSE' }
   s.author           = { '210496608' => 'atharva.kothawade@dream11.com' }
-  s.source           = { :git => 'https://github.com/ds-horizon/flagship-sdks.git', :tag => s.version.to_s }
-  s.source_files = 'FlagshipFeatureFlags/Classes/**/*'
+  s.source           = { :git => 'https://github.com/ds-horizon/flagship-sdks.git', :tag => "ios-v#{s.version}" }
+  s.source_files = 'ios-sdk/FlagshipFeatureFlags/FlagshipFeatureFlags/Classes/**/*'
   
   s.ios.deployment_target = '14.0'
   s.swift_version = '5.5'
